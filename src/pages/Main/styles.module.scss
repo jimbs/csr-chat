@@ -1,0 +1,204 @@
+.CSR {
+    display: flex;
+    flex-direction: column;
+    font-family: Arial, sans-serif;
+}
+
+.mainContent {
+    display: grid;
+    grid-template-columns: 1fr 3fr;
+    height: calc(100vh - 85px);
+    gap: 1px;
+}
+
+.headerContainer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #d11a2a;
+    padding: 10px 20px;
+    color: #fff;
+    width: 100%;
+    margin: 0;
+    // position: fixed;
+    top: 0;
+    left: 0;
+    box-sizing: border-box;
+    z-index: 12;
+}
+
+.leftSection {
+    display: flex;
+    align-items: center;
+}
+
+.profilePicture {
+    overflow: hidden;
+    width: 50px;
+    height: 50px;
+    background-color: #fff;
+    border-radius: 50%;
+    margin-right: 10px;
+}
+
+.userInfo {
+    display: flex;
+    flex-direction: column;
+}
+
+.userName {
+    font-size: 18px;
+    font-weight: bold;
+    margin: 0;
+}
+
+.userId {
+    font-size: 14px;
+    margin: 0;
+}
+
+.hamburgerMenu {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+}
+
+.menuIcon {
+    width: 59px; /* Adjust the size of the icon */
+    height: 65px;
+}
+
+.sidebar {
+    width: 300px;
+    background: #f9f9f9;
+    border-right: 1px solid #ddd;
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+}
+
+.tabs {
+    display: flex;
+    justify-content: space-around;
+    padding: 10px 0;
+    background: #fff;
+    border-bottom: 1px solid #ddd;
+}
+
+.tabs button {
+    flex: 1;
+    padding: 10px;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.tabs .active {
+    color: #fff;
+    background: #0ca82e;
+    border-radius: 5px;
+}
+
+.conversations {
+    overflow-y: auto;
+    flex: 1;
+}
+
+.conversation {
+    display: flex;
+    align-items: center;
+    padding: 10px;
+    border-bottom: 1px solid #ddd;
+    cursor: pointer;
+}
+
+.conversation:hover {
+    background: #f5f5f5;
+}
+
+.avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: #ccc;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 10px;
+    font-size: 16px;
+    font-weight: bold;
+    color: #fff;
+}
+
+.details {
+    flex: 1;
+}
+
+.name {
+    font-weight: bold;
+    margin: 0;
+}
+
+.message {
+    margin: 0;
+    font-size: 12px;
+    color: #555;
+}
+
+.time {
+    font-size: 10px;
+    color: #888;
+}
+
+.chatArea {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+}
+
+.noConversation {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #888;
+    font-size: 18px;
+}
+
+.messageBox {
+    display: flex;
+    align-items: center;
+    padding: 10px;
+    border-top: 1px solid #ddd;
+}
+
+.input {
+    flex: 1;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    margin-right: 10px;
+}
+
+.sendButton {
+    padding: 10px 20px;
+    background: #0ca82e;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.noSelection {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    color: #666;
+    font-size: 1.1rem;
+    border-left: 1px solid #e0e0e0;  // Lighter, more subtle divider color
+    background-color: #f5f5f5;  // Light background to differentiate the area
+}

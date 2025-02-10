@@ -1,0 +1,49 @@
+// Mobile
+.layout-container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+}
+
+.header {
+  position: fixed;
+  top: 0;
+  width: 100%;
+  z-index: 1000;
+}
+
+.footer {
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  z-index: 1000;
+}
+
+.content {
+  flex: 1;
+  margin-top: 0px;
+  overflow-y: auto;
+}
+
+// Desktop
+.desktopLayoutContainer {
+  position: fixed;
+  top: 0;
+  width: 100%;
+  z-index: 1000;
+}
+
+.desktopHeader {
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  z-index: 1000;
+}
+
+.desktopContent {
+  flex: 1;
+  margin-top: 0px;
+  overflow-y: auto;
+}
+

@@ -1,0 +1,196 @@
+.modalOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal {
+  background-color: white;
+  border-radius: 25px;
+  width: 500px;
+  height: 500px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  text-align: center;
+
+  .modalHeader {
+    display: flex;
+    align-items: center;
+    justify-content: left;
+    border-radius: 25px 25px 0px 0px;
+    color:#FFFFFF; // Default text color
+    font-size: 18px;
+    font-weight: bold;
+    padding: 5px;
+    height: 10%;
+    
+  
+    // Style for LETRA A
+    &.headerA {
+      background: linear-gradient( #FF2020, #C80000);
+    }
+  
+    // Style for LETRA B
+    &.headerB {
+      background: linear-gradient(#00C0FA, #015EEA); // Blue gradient for B
+    }
+  
+    .betType {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+  
+      .betIcon {
+        width: 50px;
+        height: 50px;
+      }
+  
+      .betLabel {
+        font-size: 20px;
+        font-weight: bold;
+        font-family: "Baloo 2", serif !important;
+      }
+    }
+  }
+
+  .betAmounts {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr); // 3 buttons per row
+    gap: 10px; // Spacing between buttons
+    margin: 15px;
+    height: 60%;
+  
+    .amountButton {
+      background-color: #d9d9d9; // Default background
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: bold;
+      color: #FFFFFF; // Black text color
+      padding: 10px 0;
+      cursor: pointer;
+      transition: background-color 0.3s ease, transform 0.2s ease;
+  
+      &:hover {
+        background-color: #cfcfcf; // Slightly darker gray on hover
+      }
+  
+      &:active {
+        background-color: #bfbfbf; // Even darker gray on click
+      }
+  
+      &.selected {
+        background-color: #00a24a; // Green background for selected
+        color: #fff; // White text for contrast
+      }
+    }
+  }
+
+  .inputContainer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 10%;
+  }
+  
+  .inputWrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    padding: 10px 15px;
+    background-color: white;
+    margin-left: 15px;
+    margin-right: 15px;
+    position: relative;
+    width: 100%; // Adjust as needed
+  
+    &:focus-within {
+      border-color: #00a24a;
+    }
+  
+    .amountInput {
+      text-align: center;
+      border: none;
+      outline: none;
+      font-size: 16px;
+      color: #333;
+      background-color: transparent;
+      font-weight: bold;
+      width: 100%;
+      
+      &::placeholder {
+        color: #aaa;
+        text-align: center;
+      }
+    }
+  
+    .currency {
+      position: absolute;
+      right: 15px; // Keeps ₱ on the right when empty
+      font-size: 16px;
+      font-weight: bold;
+      color: #888;
+      pointer-events: none;
+      transition: all 0.2s ease-in-out;
+    }
+  
+    &.hasValue {
+      .currency {
+        left: 15px; // Moves ₱ to the left when there’s input
+        right: auto;
+        color: black;
+      }
+    }
+  }
+  
+  .modalActions {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    height: 10%;
+    margin: 0 18px;
+
+    .resetButton,
+      .confirmButton {
+        padding: 10px 20px;
+        border-radius: 20px;
+        font-size: 16px;
+        font-weight: bold;
+        border: none;
+        transition: all 0.3s ease;
+
+        &.resetButton {
+          background: linear-gradient( #FF2020, #C80000);
+          color: #ffffff;
+
+          &:hover:enabled {
+            background-color: #ff0000; // Darker red on hover
+          }
+        }
+
+        &.confirmButton {
+          background: linear-gradient( #00CB60, #009135);
+          color: #ffffff;
+
+          &:hover:enabled {
+            background-color: #008000; // Darker green on hover
+          }
+        }
+
+        &:disabled {
+          background-color: #d3d3d3; // Gray for disabled state
+          color: #ffffff;
+          cursor: not-allowed;
+          opacity: 0.7;
+        }
+      }
+  }
+}

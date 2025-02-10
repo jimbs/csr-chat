@@ -1,0 +1,104 @@
+.terms-modal {
+  text-align: center;
+  padding: 20px;
+
+  .logo {
+    width: 267px;
+    height: 81px;
+  }
+
+  .title {
+    font-size: 12px;
+    color: #000000;
+    font-weight: 600;
+    text-align: left;
+    margin: 0.5px 10px;
+    font-family: "Baloo 2", serif !important;
+
+  }
+
+  .terms-list {
+    text-align: left;
+    margin: 16px 20px;
+    padding-left: 20px;
+    font-family: "Baloo 2", serif !important;
+
+
+    li {
+      font-size: 13px;
+      margin-bottom: 10px;
+      color: #555;
+      line-height: 1.4;
+      font-family: "Baloo 2", serif !important;
+
+    }
+  }
+
+  .important-note {
+    font-size: 12px;
+    color: #000000;
+    font-weight: 600;
+    text-align: left;
+    margin: 0.5px 10px;
+    font-family: "Baloo 2", serif !important;
+
+  }
+
+  .links {
+    margin: 16px 0;
+    font-size: 13px;
+    font-family: "Baloo 2", serif !important;
+
+    a {
+      color: #007aff;
+
+      &:hover {
+        text-decoration: underline;
+      }
+    }
+  }
+  .divider {
+    border: none;
+    border-top: 1px solid #D9D9D9;
+    margin: 20px 0;
+  }
+
+  .accept-button {
+    background: linear-gradient(#00CB60, #009135); // Add the gradient here
+    border-radius: 25px;
+    width: 280px;
+    height: 45px;
+    font-family: "Baloo 2", serif !important;
+
+
+    &:hover {
+      background: linear-gradient(#009135, #00CB60); // Add the gradient here
+    }
+  }
+
+  .responsible-gaming {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    margin: 16px 0;
+
+    img {
+      height: 35px; // Adjust icon sizes for smaller modal
+    }
+  }
+
+  .footer-note {
+    font-size: 11px;
+    color: #1A1A1A;
+    font-family: "Baloo 2", serif !important;
+
+
+    a {
+      color: #007aff;
+
+      &:hover {
+        text-decoration: underline !important;
+      }
+    }
+  }
+}

@@ -1,0 +1,26 @@
+.bottomNavContainer {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  z-index: 1000;
+
+}
+
+.bottomNavAction {
+  color: gray;
+
+  &.Mui-selected {
+    color: black; /* Change this to your desired selected color */
+    .MuiBottomNavigationAction-label {
+      color: black; /* Ensure the label color remains the same */
+    }
+    & .MuiSvgIcon-root {
+      color: black; /* Ensure the icon color remains the same */
+    }
+  }
+}

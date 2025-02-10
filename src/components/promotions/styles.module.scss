@@ -1,0 +1,47 @@
+.promotions {
+  margin-top: 10px;  
+  background: #fff; // Optional: Set a background color
+  border-radius: 12px;
+  font-family: "Baloo 2", serif !important;
+
+  .header {
+    display: flex;
+    align-items: center;
+    background: linear-gradient( #FFEA00, #FFC600) !important; 
+    border-radius: 12px;
+    padding: 8px 16px;
+    margin-bottom: 16px !important;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+
+    .header-icon {
+      width: 23.4px !important;
+      height: 20px !important;
+      margin-right: 8px !important;
+    }
+
+    .header-title {
+      font-size: 12px !important;
+      font-weight: bold;
+      color: #000;
+      font-family: "Baloo 2", serif !important;
+    }
+  }
+
+  .banners {
+    display: flex;
+    flex-direction: column;
+    gap: 16px; // Space between banners
+  }
+
+  .promo-card {
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+  }
+
+  .promo-image {
+    width: 100%;
+    object-fit: cover;
+    height: auto;
+  }
+}
