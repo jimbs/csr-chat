@@ -1,8 +1,8 @@
 import React from "react";
 import { Outlet } from "react-router-dom";
-import { MobileHeader } from "../header/mobile/Index";
-import { DesktopHeader } from "../header/desktop/Index";
-import { Footer } from "../footer/Index";
+import { MobileHeader } from "../header/mobile";
+import { DesktopHeader } from "../header/desktop";
+import { Footer } from "../footer";
 import styles from "./styles.module.scss";
 import MediaQuery from 'react-responsive';
 

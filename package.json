@@ -4,10 +4,14 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite --port 3005",
+    "dev": "vite --port 3005 --host",
     "build": "vite build",
     "lint": "eslint . --ext js,jsx --report-unused-disable-directives --max-warnings 0",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "build:be": "npm run build:client && npm run build:server",
+    "build:client": "vite build --outDir dist/client",
+    "build:server": "vite build --ssr src/entry-server.tsx --outDir dist/server",
+    "serve": "NODE_ENV=production node server.ts"
   },
   "dependencies": {
     "@emotion/react": "^11.13.0",
@@ -19,10 +23,12 @@
     "@mui/icons-material": "^5.16.7",
     "@mui/material": "^5.16.7",
     "@mui/x-date-pickers": "^5.0.20",
-    "@types/node": "^22.2.0",
+    "@types/express": "^5.0.0",
+    "@types/node": "^22.13.5",
     "axios": "^1.7.7",
     "clsx": "^2.1.1",
     "date-fns": "^2.30.0",
+    "express": "^4.21.2",
     "hls.js": "^1.5.19",
     "js-cookie": "^3.0.5",
     "jwt-decode": "^4.0.0",
@@ -38,14 +44,15 @@
     "react-router-dom": "^6.28.0",
     "react-slick": "^0.30.2",
     "slick-carousel": "^1.8.1",
+    "ts-node": "^10.9.2",
     "uuid": "^10.0.0",
     "zustand": "^4.5.5"
   },
   "devDependencies": {
     "@types/moment": "^2.11.29",
     "@types/node-sass": "^4.11.8",
-    "@types/react": "^18.3.3",
-    "@types/react-dom": "^18.3.0",
+    "@types/react": "^19.0.10",
+    "@types/react-dom": "^19.0.4",
     "@types/react-icons": "^3.0.0",
     "@types/react-router-dom": "^5.3.3",
     "@types/react-slick": "^0.23.13",
@@ -56,8 +63,10 @@
     "eslint-plugin-react-hooks": "^4.6.2",
     "eslint-plugin-react-refresh": "^0.4.7",
     "nodemon": "^3.1.4",
-    "sass": "^1.83.4",
-    "typescript": "^5.2.2",
+    "sass": "^1.85.1",
+    "ts-node-dev": "^2.0.0",
+    "tsconfig-paths": "^4.2.0",
+    "typescript": "^5.7.3",
     "vite": "^5.4.14"
   }
 }
