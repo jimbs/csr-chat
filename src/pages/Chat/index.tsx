@@ -1,196 +1,421 @@
 import "./styles.module.scss";
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useMemo } from "react";
 import { AttachFile, EmojiEmotions, Send } from "@mui/icons-material";
 import styles from "./styles.module.scss";
-import { generateCustomUUID } from "../../helper/generate.js";
+import {
+  isDateEqual,
+  formatMessageDate,
+  formatMessageTime,
+  getCurrentDateTime,
+} from "../../helper/chatDateParser";
+import { PollingService } from "../../services/pollingService";
 
 const staticMessages = [
   {
     id: 1,
-    text: "Hello! How can I help you today?",
+    message: "Hello! How can I help you today?",
     sender: "operator",
     time: "09:00",
+    date_created: "2025-01-26",
+    user_id: 128,
   },
   {
     id: 2,
-    text: "I need help with my account",
+    message: "I need help with my account",
     sender: "user",
     time: "09:01",
+    date_created: "2025-01-26",
+    user_id: 129,
   },
   {
     id: 3,
-    text: "Sure, I'd be happy to help. What seems to be the issue?",
+    message: "Sure, I'd be happy to help. What seems to be the issue?",
     sender: "operator",
     time: "09:02",
+    date_created: "2025-01-26",
+    user_id: 128,
   },
   {
     id: 4,
-    text: "I can't access my dashboard",
+    message: "I can't access my dashboard",
     sender: "user",
     time: "09:03",
+    date_created: "2025-01-25",
+    user_id: 129,
   },
   {
     id: 5,
-    text: "Let me check that for you. When did this issue start?",
+    message: "Let me check that for you. When did this issue start?",
     sender: "operator",
     time: "09:04",
+    date_created: "2025-01-25",
+    user_id: 128,
   },
-  { id: 6, text: "Since this morning", sender: "user", time: "09:05" },
+  {
+    id: 6,
+    message: "Since this morning",
+    sender: "user",
+    time: "09:05",
+    date_created: "2025-01-25",
+    user_id: 129,
+  },
   {
     id: 7,
-    text: "I see. Have you tried clearing your browser cache?",
+    message: "I see. Have you tried clearing your browser cache?",
     sender: "operator",
     time: "09:06",
+    date_created: "2025-01-24",
+    user_id: 128,
   },
   {
     id: 8,
-    text: "No, I haven't. How do I do that?",
+    message: "No, I haven't. How do I do that?",
     sender: "user",
     time: "09:07",
+    date_created: "2025-01-24",
+    user_id: 129,
   },
   {
     id: 9,
-    text: "I'll guide you through the process",
+    message: "I'll guide you through the process",
     sender: "operator",
     time: "09:07",
+    date_created: "2025-01-24",
+    user_id: 128,
   },
   {
     id: 10,
-    text: "Press Ctrl+Shift+Delete on your keyboard",
+    message: "Press Ctrl+Shift+Delete on your keyboard",
     sender: "operator",
     time: "09:07",
+    date_created: "2025-01-24",
+    user_id: 128,
   },
-  { id: 11, text: "Okay, done", sender: "user", time: "09:10" },
+  {
+    id: 11,
+    message: "Okay, done",
+    sender: "user",
+    time: "09:10",
+    date_created: "2025-01-23",
+    user_id: 129,
+  },
   {
     id: 12,
-    text: "Now select 'Cached images and files' and click Clear Data",
+    message: "Now select 'Cached images and files' and click Clear Data",
     sender: "operator",
     time: "09:11",
+    date_created: "2025-01-23",
+    user_id: 128,
   },
-  { id: 13, text: "I've done that", sender: "user", time: "09:12" },
+  {
+    id: 13,
+    message: "I've done that",
+    sender: "user",
+    time: "09:12",
+    date_created: "2025-01-23",
+    user_id: 129,
+  },
   {
     id: 14,
-    text: "Great! Now try accessing your dashboard again",
+    message: "Great! Now try accessing your dashboard again",
     sender: "operator",
     time: "09:13",
+    date_created: "2025-01-22",
+    user_id: 128,
   },
-  { id: 15, text: "It works now! Thank you!", sender: "user", time: "09:14" },
+  {
+    id: 15,
+    message: "It works now! Thank you!",
+    sender: "user",
+    time: "09:14",
+    date_created: "2025-01-22",
+    user_id: 129,
+  },
   {
     id: 16,
-    text: "You're welcome! Is there anything else I can help you with?",
+    message: "You're welcome! Is there anything else I can help you with?",
     sender: "operator",
     time: "09:15",
+    date_created: "2025-01-22",
+    user_id: 128,
   },
   {
     id: 17,
-    text: "No, that's all. Thanks again!",
+    message: "No, that's all. Thanks again!",
     sender: "user",
     time: "09:16",
+    date_created: "2025-01-21",
+    user_id: 129,
   },
   {
     id: 18,
-    text: "Glad I could help. Have a great day!",
+    message: "Glad I could help. Have a great day!",
     sender: "operator",
     time: "09:17",
+    date_created: "2025-01-21",
+    user_id: 128,
   },
-  { id: 19, text: "You too!", sender: "user", time: "09:18" },
+  {
+    id: 19,
+    message: "You too!",
+    sender: "user",
+    time: "09:18",
+    date_created: "2025-01-21",
+    user_id: 129,
+  },
   {
     id: 20,
-    text: "Thank you for using our service!",
+    message: "Thank you for using our service!",
     sender: "operator",
     time: "09:19",
+    date_created: "2025-01-21",
+    user_id: 128,
   },
-  // Add more messages as needed
 ];
 
-export const Chat: React.FC = () => {
-  const [message, setMessage] = useState("");
-  const messagesEndRef = useRef<null | HTMLDivElement>(null);
+// const tokenn = localStorage.getItem("token");
+const token =
+  "Pl813FYaeWqsXcT1KtTKBWZLMnAyNGh6UmQ4cXEwUE1UVG1xdTk0aVJ4enlXRS8vdnU5UllpUGRQZFVvSkIrOHlwMmwrYk5Ba2czb3hDQ1JtdTlWRkJvRFJZejFNcnAyMGRxNHozK3J3OVVhTU80ZDZEcm5lZ1Z0TWUwYnlVbmNuSG54Z29KcjR0UWc4STFuU0l6TWtPN2g3Q2Z5ZTVCTE1ZS0VrQT09";
+const user_id = -5;
+const ticket_number = "T-220250302035826";
 
-  const uuid = useRef(generateCustomUUID());
+export const Chat: React.FC = () => {
+  const [message, setMessage] = useState<any>("");
+  const messagesEndRef = useRef<null | HTMLDivElement>(null);
+  const [messages, setMessages] = useState<any>([]);
+  const [sendingMessages, updateSendingMessages] = useState<any>([]);
+  const [data, setData] = useState<any>(null);
+  const messagesList = useMemo(
+    () =>
+      messages
+        .map((msg: any) =>
+          msg.date_created
+            ? {
+                ...msg,
+                date: formatMessageDate(msg.date_created) ?? null,
+                time: formatMessageTime(msg.date_created) ?? null,
+              }
+            : msg
+        )
+        .sort(
+          (a: any, b: any) =>
+            new Date(a.date_created).getTime() -
+            new Date(b.date_created).getTime()
+        ),
+    [messages]
+  );
+  const polling = useMemo(
+    () =>
+      new PollingService(
+        async () => {
+          try {
+            const response = await fetch("/api/get-ticket-messages", {
+              method: "POST",
+              body: JSON.stringify({
+                data: {
+                  ticket_number: ticket_number,
+                  user_id: user_id,
+                },
+              }),
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${token}`,
+              },
+            });
+            const newMessages = await response.json();
+            return newMessages;
+          } catch (error) {
+            console.error("Error fetching new messages:", error);
+            throw error;
+          }
+        },
+        (newMessages) => {
+          if (newMessages.status_code == 200) {
+            // Filter duplicates by message id
+            setMessages((prevMessages: any) => {
+              const existingIds = new Set(
+                prevMessages.map((msg: any) => msg.id)
+              );
+              const uniqueNewMessages = newMessages.data.filter(
+                (msg: any) => !existingIds.has(msg.id) || !msg.id
+              );
+
+              prevMessages = prevMessages
+                .sort((a: any, b: any) => {
+                  // Handle messages without id (uuid only) by placing them at the end
+                  if (!a.id) return 1;
+                  if (!b.id) return -1;
+                  return parseInt(a.id) - parseInt(b.id);
+                })
+                .filter((msg: any) => {
+                  return uniqueNewMessages.findIndex(
+                    (_msg: any) =>
+                      _msg.uuid == msg.uuid &&
+                      msg.id == _msg.ticket_message_number
+                  );
+                });
+              let _newMessages = prevMessages.filter((msg: any) => {
+                if (msg.uuid) {
+                  const sending = sendingMessages.find(
+                    (_: any) => _.uuid == msg.uuid
+                  );
+                  const isExist = existingIds.has(
+                    sending?.ticket_message_id.toString()
+                  );
+                  if (isExist) {
+                    updateSendingMessages(() => {
+                      let clone = [...sendingMessages];
+                      clone.splice(
+                        clone.findIndex((_: any) => _.uuid == msg.uuid),
+                        1
+                      );
+                      return clone;
+                    });
+                    return !isExist;
+                  }
+                  return true;
+                }
+                return true;
+              });
+
+              return [..._newMessages, ...uniqueNewMessages];
+            });
+          }
+        },
+        5000
+      ),
+    []
+  ); // Remove messages from dependencies
+
+  useEffect(() => {
+    polling.start();
+    // Cleanup on unmount
+    return () => {
+      if (polling.isActive()) {
+        polling.stop();
+      }
+    };
+  }, []);
+
+  const uuid = Math.random().toString(36).substr(2, 9);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
-  useEffect(() => {
-    scrollToBottom();
-  }, [staticMessages]);
-
-  const handleSend = () => {
+  const handleSend = async () => {
+    const uuid = Math.random().toString(36).substring(2, 15);
     if (message.trim()) {
-      console.log("Sending message:", message);
-      setMessage("");
+      const newMessage = {
+        uuid,
+        user_id: user_id,
+        message: message,
+        ticket_number: ticket_number,
+        date_created: getCurrentDateTime(),
+      };
+      setMessages((prevMessages) => [...prevMessages, newMessage]);
+      const res = await fetch("/api/send-ticket-message", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ data: newMessage }),
+      });
+      const _data = await res.json();
+
+      if (_data.status_code == 201)
+        updateSendingMessages((prev: any) => [
+          ...prev,
+          { uuid, ..._data.data },
+        ]);
     }
   };
 
-  const [isOnline, setIsOnline] = useState(true); // Add this state
-
   return (
-    <div className={styles.chatContainer}>
-      {/* <div className={styles.chatHeader}>
-        <div className={styles.userAvatar}>
-          <img src="https://placehold.co/50" alt="User" />
-        </div>
-        <div className={styles.userInfo}>
-          <h3 className="pb-0 mb-0">
-            John Doe
-            <span
-              className={`${styles.status} ${
-                isOnline ? styles.online : styles.offline
+    <div
+      className={styles.chatContainer}
+      key={ticket_number ?? "ticket-number"}
+    >
+      <div className={styles.messageListWrapper}>
+        <div className={styles.messageList}>
+          {messagesList.map((msg: any, index: any) => (
+            <div
+              key={`${msg.id}-${index}`}
+              className={`${styles.messageItem} ${
+                msg.user_id == user_id ? styles.operator : styles.user
               }`}
-            ></span>
-          </h3>
-        </div>
-        <div className={styles.ticketInfo}>
-          <span className={styles.ticketNumber}>Ticket No. 123456</span>
-          <img src="/assets/Icons/more-icon.svg" alt="more" className={styles.moreIcon} />
-        </div>
-      </div> */}
+              style={{
+                marginTop:
+                  index != 0 &&
+                  messagesList[index ? index - 1 : 0].time == msg.time &&
+                  user_id == messagesList[index ? index - 1 : 0].user_id
+                    ? "16px"
+                    : "24px",
+              }}
+            >
+              {messagesList[index ? index - 1 : 0]?.date &&
+                msg.date &&
+                (messagesList[index ? index - 1 : 0]?.date != msg.date ||
+                  !index) && (
+                  <div className={styles["span-by-date"]}>{msg.date}</div>
+                )}
+              <div className={styles.messageContent}>
+                <span
+                  className={`${styles.messageTime}`}
+                  style={{
+                    display:
+                      index != 0 &&
+                      messagesList[index ? index - 1 : 0].time == msg.time &&
+                      user_id == messagesList[index ? index - 1 : 0].user_id
+                        ? "none"
+                        : "block",
+                    right:
+                      index > -1 && messagesList[index].user_id != user_id
+                        ? "6px"
+                        : "auto",
+                  }}
+                >
+                  {msg.created_by == user_id
+                    ? "You"
+                    : msg.user_details?.username ??
+                      msg.user_details?.mobile_number}{" "}
+                  {msg.id && msg.time}
+                </span>
 
-      <div className={styles.messageList}>
-        {staticMessages.map((msg, index) => (
-          <div
-            key={msg.id}
-            className={`${styles.messageItem} ${
-              msg.sender == "operator" ? styles.operator : styles.user
-            }`}
-          >
-            <div className={styles.messageContent}>
-              <span
-                className={`${styles.messageTime}`}
-                style={{
-                  display:
-                    index > 0 &&
-                    staticMessages[index ? index - 1 : 0].time == msg.time &&
-                    staticMessages[index ? index - 1 : 0].sender == msg.sender
-                      ? "none"
-                      : "block",
-                  right:
-                    index > 0 &&
-                    staticMessages[index ? index - 1 : 0].sender != "operator"
-                      ? "auto"
-                      : ".9rem",
-                }}
-              >
-                {msg.sender == "operator" ? "You" : msg.sender} {msg.time}
-              </span>
-              <p>{msg.text}</p>
+                {!msg.id && (
+                  <span className={`${styles.spinner} ${styles.user}`}></span>
+                )}
+
+                <p>{msg.message}</p>
+              </div>
             </div>
-          </div>
-        ))}
-        <div ref={messagesEndRef} />
+          ))}
+          <div ref={messagesEndRef} />
+        </div>
       </div>
 
       <div className={styles.inputContainer}>
         <div className={styles.inputWrapper}>
-          <input
-            type="text"
+          <textarea
             placeholder="Write your message here..."
             value={message}
-            onChange={(e) => setMessage(e.target.value)}
-            onKeyUp={(e) => e.key === "Enter" && handleSend()}
-            className={styles.messageInput}
+            onChange={(e) => {
+              setMessage(e.target.value);
+            }}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" && !e.shiftKey) {
+                e.preventDefault();
+                handleSend();
+              }
+            }}
+            className={`${styles.messageInput}`}
+            style={{
+              maxHeight: "4.5rem", // 3 lines (1.5rem per line)
+              overflowY: "auto",
+              resize: "none",
+            }}
+            rows={1}
           />
           <div className={styles.inputActions}>
             <Send className={styles.icon} onClick={handleSend} />
@@ -199,14 +424,14 @@ export const Chat: React.FC = () => {
         <div className={styles.buttonGroup}>
           <button className={styles.attachButton}>
             <img
-              src="/assets/Icons/attach-file.svg"
+              src="/assets/Support/Icons/attach-file.svg"
               alt=""
               className="p-0"
               height={32}
             />
           </button>
-          <button className={styles.endButton}>End</button>
-          <button className={styles.rateButton}>Rate</button>
+          {/* <button className={styles.endButton}>End</button>
+          <button className={styles.rateButton}>Rate</button> */}
         </div>
       </div>
     </div>

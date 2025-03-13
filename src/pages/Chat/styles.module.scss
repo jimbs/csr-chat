@@ -1,191 +1,313 @@
 .chatContainer {
-    display: flex;
-    flex-direction: column;
-    height: 100%;
-    background: #fff;
-    position: relative; // Add this
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  background: #f5f5f5;
+  position: relative; // Add this
+  font-family: "Baloo 2", Courier, monospace;
 }
 
+.messageListWrapper {
+  height: 100%;
+}
 
 .messageList {
-    flex: 1;
-    overflow-y: auto;
-    padding: 20px;
+  flex: 1;
+  overflow-y: auto;
+  padding: 20px;
+  padding-top: 2rem;
+  background: #f5f5f5;
+  max-height: calc(100vh - 120px); // Accounts for header and input container
+  margin: 0;
+  scrollbar-width: thin;
+  scrollbar-color: #0ca82e #f5f5f5;
+
+  &::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  &::-webkit-scrollbar-track {
     background: #f5f5f5;
-    max-height: calc(100vh - 250px); // Accounts for header and input container
-    margin: 0;
-    scrollbar-width: thin;
-    scrollbar-color: #0ca82e #f5f5f5;
-    
-    &::-webkit-scrollbar {
-        width: 6px;
-    }
-    
-    &::-webkit-scrollbar-track {
-        background: #f5f5f5;
-    }
-    
-    &::-webkit-scrollbar-thumb {
-        background-color: #0ca82e;
-        border-radius: 3px;
-    }
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background-color: #0ca82e;
+    border-radius: 3px;
+  }
 }
 
 .userAvatar {
-    width: 50px;
-    height: 50px;
-    border-radius: 50%;
-    margin-right: 15px;
-    overflow: hidden;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  margin-right: 15px;
+  overflow: hidden;
 }
 
-
 .messageItem {
-    margin-bottom: 15px;
-    display: flex;
-    
-    &.operator {
-        justify-content: flex-start;
-        .messageContent {
-            background: #000;
-            background-color: rgb(255, 250, 209);
-        }
-    }
-    
-    &.user {
-        justify-content: flex-end;
-        .messageContent {
-            background: #0ca82e;
-            color: #fff;
-        }
-    }
+  margin-bottom: 0;
+  display: flex;
+  flex-direction: column;
 
-    &.chat-date {
-        justify-content: center;
-        text-align: center;
-        margin-top: 20px;
-        margin-bottom: 20px;
-        font-size: 14px;
-        color: #999;
+  &.operator {
+    align-items: flex-start;
+
+    .messageContent {
+      background: #000;
+      background-color: rgb(255, 250, 209);
     }
+  }
+
+  &.user {
+    align-items: flex-end;
+
+    .messageContent {
+      background: #0ca82e;
+      color: #fff;
+    }
+  }
+
+  &.chat-date {
+    justify-content: center;
+    text-align: center;
+    margin-top: 20px;
+    margin-bottom: 20px;
+    font-size: 14px;
+    color: #999;
+  }
 }
 
 .messageContent {
-    max-width: 70%;
-    padding: 10px 15px;
-    border-radius: 15px;
-    box-shadow: 0 1px 2px rgba(0,0,0,0.1);
-    position: relative;
-    
-    p {
-        margin: 0;
-        font-size: 14px;
-    }
+  max-width: 70%;
+  padding: 10px 15px;
+  border-radius: 100px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+  position: relative;
+
+  p {
+    margin: 0;
+    font-size: 14px;
+  }
 }
 
 .messageTime {
-    display: block;
-    font-size: 11px;
-    margin-top: 5px;
-    opacity: 0.7;
-    position: absolute;
-    top: -1.2rem;
-    color: #999999;
+  white-space: nowrap;
+  display: block;
+  font-size: 11px;
+  margin-top: 5px;
+  opacity: 0.7;
+  position: absolute;
+  top: -1.4rem;
+  right: 0;
+  color: #999999;
 }
 
 .inputContainer {
-    padding: 12px 16px;
-    display: flex;
-    gap: 12px;
-    align-items: center;
+  padding: 12px 16px;
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  background: none;
 }
 
 .inputWrapper {
-    flex: 1;
-    display: flex;
-    align-items: center;
-    background: white;
-    border-radius: 25px;
-    padding: 8px 16px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  flex: 1;
+  display: flex;
+  align-items: center;
+  background: white;
+  padding: 8px 14px;
+  // box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  border-radius: 10px;
+  border: 1px solid #d9d9d9;
 }
 
 .messageInput {
-    flex: 1;
-    border: none;
-    outline: none;
-    padding: 8px;
-    font-size: 14px;
-    background: transparent;
+  line-height: 1.5rem;
+  transition: height 0.2s ease;
 
-    &::placeholder {
-        color: #999;
-    }
+  height: 37px;
+  max-height: 150px;
+  resize: vertical;
+  overflow-y: auto;
+  line-height: 1.5;
+  width: 100%;
+  transition: height 0.1s ease-in-out;
+  border: none;
+  outline: none;
+  padding: 8px 0;
+  font-size: 14px;
+  background: transparent;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+
+  &::placeholder {
+    color: #999;
+  }
 }
 
 .inputActions {
-    display: flex;
-    gap: 8px;
-    align-items: center;
+  display: flex;
+  gap: 8px;
+  align-items: center;
 
-    & .icon {
-        color: #0ca82e;
-        cursor: pointer;
-        font-size: 20px;
-        
-        &:hover {
-            color: #333;
-        }
+  & .icon {
+    color: #0ca82e;
+    cursor: pointer;
+    font-size: 20px;
+
+    &:hover {
+      color: #333;
     }
+  }
 }
-
 
 .buttonGroup {
-    display: flex;
-    gap: 8px;
+  display: flex;
+  gap: 8px;
 }
 
-.endButton, .rateButton {
-    padding: 8px 24px;
-    border-radius: 20px;
-    border: none;
-    cursor: pointer;
-    font-weight: 500;
-    transition: background-color 0.2s;
+.endButton,
+.rateButton {
+  padding: 8px 24px;
+  border-radius: 20px;
+  border: none;
+  cursor: pointer;
+  font-weight: 500;
+  transition: background-color 0.2s;
 }
 
 .endButton {
-    background-color: #0ca82e;
-    color: #fff;
+  background-color: #0ca82e;
+  color: #fff;
 }
 
 .rateButton {
-    background-color: #0ca82e;
-    color: #fff;
-    
-    // &:hover {
-    //     background-color: #e0e0e0;
-    // }
+  background-color: #0ca82e;
+  color: #fff;
+
+  // &:hover {
+  //     background-color: #e0e0e0;
+  // }
 }
 
 .sendIcon {
-    color: #0ca82e;
+  color: #0ca82e;
 }
 
 .attachButton {
-    padding: 0;
-    height: min-content;
-    border-radius: 20px;    
-    border: none;
-    cursor: pointer;
-    // background-color: #f0f0f0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    filter: grayscale(100%);
+  padding: 0;
+  height: min-content;
+  border-radius: 20px;
+  border: none;
+  cursor: pointer;
+  // background-color: #f0f0f0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  filter: grayscale(100%);
 
-    &:hover {
-        filter: none;
-    }
+  &:hover {
+    filter: none;
+  }
 }
 
+.chatHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem 0.3rem;
+  background: linear-gradient(180deg, #ffea00 0%, #ffc600 100%);
+  box-shadow: 2px 2px 4px 0px #00000040;
+  border-radius: 16px 16px 0 0;
+}
+
+.headerLeft {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.csAvatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  // border: 2px solid white;
+}
+
+.headerInfo {
+  h3 {
+    font-size: 1rem;
+    font-weight: 600;
+    margin: 0;
+    color: #000;
+  }
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.ticketId {
+  font-size: 0.775rem;
+  color: #4b5563;
+}
+
+.headerRight {
+  button {
+    background: none;
+    border: none;
+    padding: 8px;
+    cursor: pointer;
+
+    img {
+      width: 24px;
+      height: 24px;
+    }
+  }
+}
+
+.span-by-date {
+  width: 100%;
+  margin-bottom: 1rem;
+  font-family: Baloo 2;
+  font-weight: 400;
+  font-size: 12px;
+  line-height: 100%;
+  letter-spacing: 0%;
+  text-align: center;
+  vertical-align: middle;
+  color: #999999;
+  display: block;
+}
+
+span.spinner {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  margin-left: 5px;
+  border-radius: 50%;
+  border: 1px solid #f3f3f3;
+  border-top: 2px solid #3498db;
+  animation: 1s cubic-bezier(0.4, 0, 1, 1) 0s infinite normal none running spin;
+  position: absolute;
+  top: 1rem;
+}
+
+span.spinner.user {
+  right: -0.8rem;
+}
+
+span.spinner.operator {
+  left: 0;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(360deg);
+  }
+}
