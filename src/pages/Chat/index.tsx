@@ -424,14 +424,14 @@ export const Chat: React.FC = () => {
         <div className={styles.buttonGroup}>
           <button className={styles.attachButton}>
             <img
-              src="/assets/Support/Icons/attach-file.svg"
-              alt=""
+              src="/assets/Icons/attach-file.svg"
+                alt=""
               className="p-0"
               height={32}
             />
           </button>
-          {/* <button className={styles.endButton}>End</button>
-          <button className={styles.rateButton}>Rate</button> */}
+          <button className={styles.endButton}>End</button>
+          <button className={styles.rateButton}>Rate</button>
         </div>
       </div>
     </div>

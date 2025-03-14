@@ -1,10 +1,11 @@
 .chatContainer {
   display: flex;
   flex-direction: column;
-  height: 100vh;
+  height: calc(100vh - 145px);
   background: #f5f5f5;
   position: relative; // Add this
   font-family: "Baloo 2", Courier, monospace;
+  display: relative;
 }
 
 .messageListWrapper {
@@ -116,6 +117,7 @@
   align-items: center;
   background: white;
   padding: 8px 14px;
+  max-height: 4.5rem;
   // box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   border-radius: 10px;
   border: 1px solid #d9d9d9;
@@ -124,8 +126,7 @@
 .messageInput {
   line-height: 1.5rem;
   transition: height 0.2s ease;
-
-  height: 37px;
+  
   max-height: 150px;
   resize: vertical;
   overflow-y: auto;
