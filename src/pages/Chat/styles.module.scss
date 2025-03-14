@@ -121,29 +121,22 @@
   // box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   border-radius: 10px;
   border: 1px solid #d9d9d9;
+  gap: 1rem;
 }
 
 .messageInput {
-  line-height: 1.5rem;
-  transition: height 0.2s ease;
-  
-  max-height: 150px;
-  resize: vertical;
-  overflow-y: auto;
-  line-height: 1.5;
   width: 100%;
-  transition: height 0.1s ease-in-out;
-  border: none;
-  outline: none;
-  padding: 8px 0;
-  font-size: 14px;
-  background: transparent;
+  max-height: 4.8rem;
+  overflow-y: auto;
+  resize: none;
   white-space: pre-wrap;
   word-wrap: break-word;
-  overflow-wrap: break-word;
+  outline: none;
 
-  &::placeholder {
-    color: #999;
+  &.empty::before {
+    content: attr(data-placeholder);
+    color: #888;
+    pointer-events: none;
   }
 }
 

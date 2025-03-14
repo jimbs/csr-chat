@@ -397,11 +397,14 @@ export const Chat: React.FC = () => {
 
       <div className={styles.inputContainer}>
         <div className={styles.inputWrapper}>
-          <textarea
-            placeholder="Write your message here..."
-            value={message}
-            onChange={(e) => {
-              setMessage(e.target.value);
+          <div
+            contentEditable
+            data-placeholder="Write your message here..."
+            onInput={(e) => {
+              const target = e.target as HTMLDivElement;
+              setMessage(target.innerText);
+              // Add/remove placeholder class based on content
+              target.classList.toggle('empty', !target.innerText.trim());
             }}
             onKeyDown={(e) => {
               if (e.key === "Enter" && !e.shiftKey) {
@@ -409,13 +412,8 @@ export const Chat: React.FC = () => {
                 handleSend();
               }
             }}
-            className={`${styles.messageInput}`}
-            style={{
-              maxHeight: "4.5rem", // 3 lines (1.5rem per line)
-              overflowY: "auto",
-              resize: "none",
-            }}
-            rows={1}
+            className={`${styles.messageInput} empty`}
+            style={{}}
           />
           <div className={styles.inputActions}>
             <Send className={styles.icon} onClick={handleSend} />
@@ -425,7 +423,7 @@ export const Chat: React.FC = () => {
           <button className={styles.attachButton}>
             <img
               src="/assets/Icons/attach-file.svg"
-                alt=""
+              alt=""
               className="p-0"
               height={32}
             />
