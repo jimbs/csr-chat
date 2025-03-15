@@ -1,31 +1,48 @@
-import React, { useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import styles from "./styles.module.scss";
 import { Outlet, useParams } from "react-router-dom";
 import { ChatList } from "../ChatList";
 
+const filters = [
+  { label: "Pending", value: "Pending", class: "all" },
+  { label: "Ongoing", value: "In Progress", class: "new" },
+  { label: "Solved", value: "Closed Resolved", class: "handled" },
+  { label: "Unresolve", value: "Closed Unresolved", class: "closed" },
+];
+
 export const CSR: React.FC = () => {
   const [isMobileListVisible, setIsMobileListVisible] = useState(false);
-  const { id } = useParams();
-
-  console.log(id)
+  const [filterBadge, setFilterBadge] = useState("Pending");
+  const { ticket_number } = useParams();
 
   return (
     <div className={styles.CSR}>
       <Header />
       <div className={styles.mainContent}>
-        <div className={`${styles.leftPanel} ${`${styles.listWrapper} ${!id ? styles.visible : ''}`}`}>
+        <div
+          className={`${styles.leftPanel} ${`${styles.listWrapper} ${
+            !ticket_number ? styles.visible : ""
+          }`}`}
+        >
           <div>
-          <ChatListBadges />
-            <ChatList />
+            <ChatListBadges
+              filterBadge={filterBadge}
+              setFilterBadge={setFilterBadge}
+            />
+            <ChatList
+              filterBadge={filterBadge}
+              selectedTicket={ticket_number}
+              setFilterBadge={setFilterBadge}
+            />
           </div>
         </div>
         <div className={styles.rightPanel}>
-          <ChatHeader 
-            isOnline={true} 
+          <ChatHeader
+            isOnline={true}
             onMenuClick={() => setIsMobileListVisible(!isMobileListVisible)}
-            showMobileMenu={!id}
+            showMobileMenu={!ticket_number}
           />
-          {id ? (
+          {ticket_number ? (
             <Outlet />
           ) : (
             <div className={styles.noSelection}>No selected conversation.</div>
@@ -63,8 +80,7 @@ const Header: React.FC = () => {
   );
 };
 
-
-const ChatHeader: React.FC<{ 
+const ChatHeader: React.FC<{
   isOnline?: boolean;
   onMenuClick?: () => void;
   showMobileMenu?: boolean;
@@ -72,10 +88,7 @@ const ChatHeader: React.FC<{
   return (
     <div className={styles.chatHeader}>
       {showMobileMenu && (
-        <button 
-          className={styles.mobileMenuButton} 
-          onClick={onMenuClick}
-        >
+        <button className={styles.mobileMenuButton} onClick={onMenuClick}>
           <img
             src="/assets/Icons/hamburger.svg"
             alt="Menu"
@@ -85,16 +98,20 @@ const ChatHeader: React.FC<{
       )}
       <div className={styles.userAvatar}>
         <img src="https://placehold.co/50" alt="User" />
-        <span className={`${styles.statusIndicator} ${isOnline ? styles.online : styles.offline}`} />
+        <span
+          className={`${styles.statusIndicator} ${
+            isOnline ? styles.online : styles.offline
+          }`}
+        />
       </div>
       <div className={styles.userInfo}>
-        <h3 className="pb-0 mb-0">
-          John Doe
-        </h3>
+        <h3 className="pb-0 mb-0">John Doe</h3>
         {/* <span className={styles.userId}>ID: {uuid.current}</span> */}
       </div>
       <div className={styles.ticketInfo}>
-        <span className={styles.ticketNumber}>Ticket ID. WC0821202487-X121</span>
+        <span className={styles.ticketNumber}>
+          Ticket ID. WC0821202487-X121
+        </span>
         <img
           src="/assets/Icons/more-icon.svg"
           alt="more"
@@ -105,43 +122,25 @@ const ChatHeader: React.FC<{
   );
 };
 
-const ChatListBadges: React.FC = () => {
-  const [filterBadge, setFilterBadge] = useState("all");
-
-  return ( <div className={styles.chatListHeader}>
-    <div className={styles.badgeContainer}>
-      <span
-        className={`${styles.badge} ${styles.all} ${
-          filterBadge === "pending" ? styles.active : ""
-        }`}
-        onClick={() => setFilterBadge("pending")}
-      >
-        Pending
-      </span>
-      <span
-        className={`${styles.badge} ${styles.new} ${
-          filterBadge === "ongoing" ? styles.active : ""
-        }`}
-        onClick={() => setFilterBadge("ongoing")}
-      >
-        Ongoing
-      </span>
-      <span
-        className={`${styles.badge} ${styles.handled} ${
-          filterBadge === "solved" ? styles.active : ""
-        }`}
-        onClick={() => setFilterBadge("solved")}
-      >
-        Solved
-      </span>
-      <span
-        className={`${styles.badge} ${styles.closed} ${
-          filterBadge === "unresolved" ? styles.active : ""
-        }`}
-        onClick={() => setFilterBadge("unresolved")}
-      >
-        Unresolve
-      </span>
+const ChatListBadges: React.FC<{
+  filterBadge: string;
+  setFilterBadge: React.Dispatch<React.SetStateAction<string>>;
+}> = ({ filterBadge, setFilterBadge }) => {
+  return (
+    <div className={styles.chatListHeader}>
+      <div className={styles.badgeContainer}>
+        {filters.map(({ label, value, class: cssClass }) => (
+          <span
+            key={label}
+            className={`${styles.badge} ${styles[cssClass]} ${
+              filterBadge === value ? styles.active : ""
+            }`}
+            onClick={() => setFilterBadge(value)}
+          >
+            {label}
+          </span>
+        ))}
+      </div>
     </div>
-  </div>);
+  );
 };

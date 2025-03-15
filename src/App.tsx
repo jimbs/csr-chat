@@ -9,7 +9,7 @@ function App() {
       <Routes>
         <Route path="/login" element={<Login />} />
         <Route path="/" element={<CSR />}>
-          <Route path=":id" element={<Chat />} />
+          <Route path=":ticket_number" element={<Chat />} />
         </Route>
       </Routes>
     </BrowserRouter>

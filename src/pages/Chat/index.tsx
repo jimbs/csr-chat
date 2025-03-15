@@ -9,6 +9,7 @@ import {
   getCurrentDateTime,
 } from "../../helper/chatDateParser";
 import { PollingService } from "../../services/pollingService";
+import { useParams } from "react-router-dom";
 
 const staticMessages = [
   {
@@ -177,7 +178,6 @@ const staticMessages = [
 const token =
   "Pl813FYaeWqsXcT1KtTKBWZLMnAyNGh6UmQ4cXEwUE1UVG1xdTk0aVJ4enlXRS8vdnU5UllpUGRQZFVvSkIrOHlwMmwrYk5Ba2czb3hDQ1JtdTlWRkJvRFJZejFNcnAyMGRxNHozK3J3OVVhTU80ZDZEcm5lZ1Z0TWUwYnlVbmNuSG54Z29KcjR0UWc4STFuU0l6TWtPN2g3Q2Z5ZTVCTE1ZS0VrQT09";
 const user_id = -5;
-const ticket_number = "T-220250302035826";
 
 export const Chat: React.FC = () => {
   const [message, setMessage] = useState<any>("");
@@ -185,6 +185,8 @@ export const Chat: React.FC = () => {
   const [messages, setMessages] = useState<any>([]);
   const [sendingMessages, updateSendingMessages] = useState<any>([]);
   const [data, setData] = useState<any>(null);
+  const { ticket_number } = useParams();
+
   const messagesList = useMemo(
     () =>
       messages
@@ -282,12 +284,13 @@ export const Chat: React.FC = () => {
             });
           }
         },
-        5000
+        1000
       ),
-    []
+    [ticket_number]
   ); // Remove messages from dependencies
 
   useEffect(() => {
+    setMessages(() => []);
     polling.start();
     // Cleanup on unmount
     return () => {
@@ -295,7 +298,7 @@ export const Chat: React.FC = () => {
         polling.stop();
       }
     };
-  }, []);
+  }, [ticket_number]);
 
   const uuid = Math.random().toString(36).substr(2, 9);
 

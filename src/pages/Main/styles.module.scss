@@ -341,7 +341,7 @@
 
 .badgeContainer {
     display: inline-grid;
-    grid-template-columns: repeat(auto-fit, minmax(5.5rem, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(5rem, 1fr));
     gap: .2rem;
     width: 100%;
     justify-content: space-evenly;
