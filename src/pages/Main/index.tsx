@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from "react";
 import styles from "./styles.module.scss";
-import { Outlet, useParams } from "react-router-dom";
+import { Outlet, useLocation, useParams } from "react-router-dom";
 import { ChatList } from "../ChatList";
 
 const filters = [
@@ -14,6 +14,19 @@ export const CSR: React.FC = () => {
   const [isMobileListVisible, setIsMobileListVisible] = useState(false);
   const [filterBadge, setFilterBadge] = useState("Pending");
   const { ticket_number } = useParams();
+  const [playerDetails, setPlayerDetails] = useState({
+    first_name: "John",
+    last_name: "Doe",
+  });
+
+
+  useEffect(() => {
+    if (window.innerWidth <= 768) {
+      setIsMobileListVisible(true);
+    } else {
+      setIsMobileListVisible(false);
+    }
+  }, [ticket_number]);
 
   return (
     <div className={styles.CSR}>
@@ -33,6 +46,9 @@ export const CSR: React.FC = () => {
               filterBadge={filterBadge}
               selectedTicket={ticket_number}
               setFilterBadge={setFilterBadge}
+              onTicketsChange={(player: any) => {
+                setPlayerDetails(player);
+              }}
             />
           </div>
         </div>
@@ -41,6 +57,7 @@ export const CSR: React.FC = () => {
             isOnline={true}
             onMenuClick={() => setIsMobileListVisible(!isMobileListVisible)}
             showMobileMenu={!ticket_number}
+            playerDetails={playerDetails}
           />
           {ticket_number ? (
             <Outlet />
@@ -84,7 +101,11 @@ const ChatHeader: React.FC<{
   isOnline?: boolean;
   onMenuClick?: () => void;
   showMobileMenu?: boolean;
-}> = ({ isOnline = true, onMenuClick, showMobileMenu }) => {
+  playerDetails: {[key: string]: string | boolean | number | object | null | undefined; }
+}> = ({ isOnline = true, onMenuClick, showMobileMenu, playerDetails }) => {
+
+  const {ticket_number} = useParams();
+
   return (
     <div className={styles.chatHeader}>
       {showMobileMenu && (
@@ -105,12 +126,12 @@ const ChatHeader: React.FC<{
         />
       </div>
       <div className={styles.userInfo}>
-        <h3 className="pb-0 mb-0">John Doe</h3>
+        <h3 className="pb-0 mb-0">{String(playerDetails.first_name)} {String(playerDetails.last_name)}</h3>
         {/* <span className={styles.userId}>ID: {uuid.current}</span> */}
       </div>
       <div className={styles.ticketInfo}>
         <span className={styles.ticketNumber}>
-          Ticket ID. WC0821202487-X121
+          Ticket ID. {ticket_number}
         </span>
         <img
           src="/assets/Icons/more-icon.svg"

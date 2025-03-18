@@ -11,170 +11,6 @@ import {
 import { PollingService } from "../../services/pollingService";
 import { useParams } from "react-router-dom";
 
-const staticMessages = [
-  {
-    id: 1,
-    message: "Hello! How can I help you today?",
-    sender: "operator",
-    time: "09:00",
-    date_created: "2025-01-26",
-    user_id: 128,
-  },
-  {
-    id: 2,
-    message: "I need help with my account",
-    sender: "user",
-    time: "09:01",
-    date_created: "2025-01-26",
-    user_id: 129,
-  },
-  {
-    id: 3,
-    message: "Sure, I'd be happy to help. What seems to be the issue?",
-    sender: "operator",
-    time: "09:02",
-    date_created: "2025-01-26",
-    user_id: 128,
-  },
-  {
-    id: 4,
-    message: "I can't access my dashboard",
-    sender: "user",
-    time: "09:03",
-    date_created: "2025-01-25",
-    user_id: 129,
-  },
-  {
-    id: 5,
-    message: "Let me check that for you. When did this issue start?",
-    sender: "operator",
-    time: "09:04",
-    date_created: "2025-01-25",
-    user_id: 128,
-  },
-  {
-    id: 6,
-    message: "Since this morning",
-    sender: "user",
-    time: "09:05",
-    date_created: "2025-01-25",
-    user_id: 129,
-  },
-  {
-    id: 7,
-    message: "I see. Have you tried clearing your browser cache?",
-    sender: "operator",
-    time: "09:06",
-    date_created: "2025-01-24",
-    user_id: 128,
-  },
-  {
-    id: 8,
-    message: "No, I haven't. How do I do that?",
-    sender: "user",
-    time: "09:07",
-    date_created: "2025-01-24",
-    user_id: 129,
-  },
-  {
-    id: 9,
-    message: "I'll guide you through the process",
-    sender: "operator",
-    time: "09:07",
-    date_created: "2025-01-24",
-    user_id: 128,
-  },
-  {
-    id: 10,
-    message: "Press Ctrl+Shift+Delete on your keyboard",
-    sender: "operator",
-    time: "09:07",
-    date_created: "2025-01-24",
-    user_id: 128,
-  },
-  {
-    id: 11,
-    message: "Okay, done",
-    sender: "user",
-    time: "09:10",
-    date_created: "2025-01-23",
-    user_id: 129,
-  },
-  {
-    id: 12,
-    message: "Now select 'Cached images and files' and click Clear Data",
-    sender: "operator",
-    time: "09:11",
-    date_created: "2025-01-23",
-    user_id: 128,
-  },
-  {
-    id: 13,
-    message: "I've done that",
-    sender: "user",
-    time: "09:12",
-    date_created: "2025-01-23",
-    user_id: 129,
-  },
-  {
-    id: 14,
-    message: "Great! Now try accessing your dashboard again",
-    sender: "operator",
-    time: "09:13",
-    date_created: "2025-01-22",
-    user_id: 128,
-  },
-  {
-    id: 15,
-    message: "It works now! Thank you!",
-    sender: "user",
-    time: "09:14",
-    date_created: "2025-01-22",
-    user_id: 129,
-  },
-  {
-    id: 16,
-    message: "You're welcome! Is there anything else I can help you with?",
-    sender: "operator",
-    time: "09:15",
-    date_created: "2025-01-22",
-    user_id: 128,
-  },
-  {
-    id: 17,
-    message: "No, that's all. Thanks again!",
-    sender: "user",
-    time: "09:16",
-    date_created: "2025-01-21",
-    user_id: 129,
-  },
-  {
-    id: 18,
-    message: "Glad I could help. Have a great day!",
-    sender: "operator",
-    time: "09:17",
-    date_created: "2025-01-21",
-    user_id: 128,
-  },
-  {
-    id: 19,
-    message: "You too!",
-    sender: "user",
-    time: "09:18",
-    date_created: "2025-01-21",
-    user_id: 129,
-  },
-  {
-    id: 20,
-    message: "Thank you for using our service!",
-    sender: "operator",
-    time: "09:19",
-    date_created: "2025-01-21",
-    user_id: 128,
-  },
-];
-
-// const tokenn = localStorage.getItem("token");
 const token =
   "Pl813FYaeWqsXcT1KtTKBWZLMnAyNGh6UmQ4cXEwUE1UVG1xdTk0aVJ4enlXRS8vdnU5UllpUGRQZFVvSkIrOHlwMmwrYk5Ba2czb3hDQ1JtdTlWRkJvRFJZejFNcnAyMGRxNHozK3J3OVVhTU80ZDZEcm5lZ1Z0TWUwYnlVbmNuSG54Z29KcjR0UWc4STFuU0l6TWtPN2g3Q2Z5ZTVCTE1ZS0VrQT09";
 const user_id = -5;
@@ -187,25 +23,29 @@ export const Chat: React.FC = () => {
   const [data, setData] = useState<any>(null);
   const { ticket_number } = useParams();
 
-  const messagesList = useMemo(
-    () =>
-      messages
-        .map((msg: any) =>
-          msg.date_created
-            ? {
-                ...msg,
-                date: formatMessageDate(msg.date_created) ?? null,
-                time: formatMessageTime(msg.date_created) ?? null,
-              }
-            : msg
-        )
-        .sort(
-          (a: any, b: any) =>
-            new Date(a.date_created).getTime() -
-            new Date(b.date_created).getTime()
-        ),
-    [messages]
+  const player_details = useMemo(
+    () => messages[0]?.player_details ?? null,
+    [ticket_number]
   );
+
+  const messagesList = useMemo(() => {
+    const sorted_data = messages
+      .map((msg: any) =>
+        msg.date_created
+          ? {
+              ...msg,
+              date: formatMessageDate(msg.date_created) ?? null,
+              time: formatMessageTime(msg.date_created) ?? null,
+            }
+          : msg
+      )
+      .sort(
+        (a: any, b: any) =>
+          new Date(a.date_created).getTime() -
+          new Date(b.date_created).getTime()
+      );
+    return sorted_data;
+  }, [messages]);
   const polling = useMemo(
     () =>
       new PollingService(
@@ -233,7 +73,6 @@ export const Chat: React.FC = () => {
         },
         (newMessages) => {
           if (newMessages.status_code == 200) {
-            // Filter duplicates by message id
             setMessages((prevMessages: any) => {
               const existingIds = new Set(
                 prevMessages.map((msg: any) => msg.id)
@@ -244,7 +83,6 @@ export const Chat: React.FC = () => {
 
               prevMessages = prevMessages
                 .sort((a: any, b: any) => {
-                  // Handle messages without id (uuid only) by placing them at the end
                   if (!a.id) return 1;
                   if (!b.id) return -1;
                   return parseInt(a.id) - parseInt(b.id);
@@ -287,12 +125,13 @@ export const Chat: React.FC = () => {
         1000
       ),
     [ticket_number]
-  ); // Remove messages from dependencies
+  );
 
   useEffect(() => {
     setMessages(() => []);
     polling.start();
-    // Cleanup on unmount
+
+    scrollToBottom();
     return () => {
       if (polling.isActive()) {
         polling.stop();
@@ -316,7 +155,8 @@ export const Chat: React.FC = () => {
         ticket_number: ticket_number,
         date_created: getCurrentDateTime(),
       };
-      setMessages((prevMessages) => [...prevMessages, newMessage]);
+      setMessages((prevMessages: any) => [...prevMessages, newMessage]);
+      setMessage("");
       const res = await fetch("/api/send-ticket-message", {
         method: "POST",
         headers: {
@@ -327,11 +167,14 @@ export const Chat: React.FC = () => {
       });
       const _data = await res.json();
 
-      if (_data.status_code == 201)
+      if (_data.status_code == 201) {
+        setTimeout(() => scrollToBottom(), 800);
+
         updateSendingMessages((prev: any) => [
           ...prev,
           { uuid, ..._data.data },
         ]);
+      }
     }
   };
 
@@ -352,8 +195,8 @@ export const Chat: React.FC = () => {
                 marginTop:
                   index != 0 &&
                   messagesList[index ? index - 1 : 0].time == msg.time &&
-                  user_id == messagesList[index ? index - 1 : 0].user_id
-                    ? "16px"
+                  msg.user_id == messagesList[index ? index - 1 : 0].user_id
+                    ? "8px"
                     : "24px",
               }}
             >
@@ -370,7 +213,7 @@ export const Chat: React.FC = () => {
                     display:
                       index != 0 &&
                       messagesList[index ? index - 1 : 0].time == msg.time &&
-                      user_id == messagesList[index ? index - 1 : 0].user_id
+                      msg.user_id == messagesList[index ? index - 1 : 0].user_id
                         ? "none"
                         : "block",
                     right:
@@ -390,7 +233,21 @@ export const Chat: React.FC = () => {
                   <span className={`${styles.spinner} ${styles.user}`}></span>
                 )}
 
-                <p>{msg.message}</p>
+                <p>
+                  {msg.message.split(/\n|\\n/).map((line: any, index: any) => (
+                    <React.Fragment
+                      key={`${line
+                        .trim()
+                        .split("")
+                        .sort()
+                        .join("")
+                        .substring(0, 6)}${index}`}
+                    >
+                      {line}
+                      {index < msg.message.split(/\n|\\n/).length - 1 && <br />}
+                    </React.Fragment>
+                  ))}
+                </p>
               </div>
             </div>
           ))}
@@ -400,23 +257,26 @@ export const Chat: React.FC = () => {
 
       <div className={styles.inputContainer}>
         <div className={styles.inputWrapper}>
-          <div
-            contentEditable
-            data-placeholder="Write your message here..."
-            onInput={(e) => {
-              const target = e.target as HTMLDivElement;
-              setMessage(target.innerText);
-              // Add/remove placeholder class based on content
-              target.classList.toggle('empty', !target.innerText.trim());
+          <textarea
+            placeholder="Write your message here..."
+            value={message}
+            onChange={(e) => {
+              setMessage(e.target.value);
+              const lineCount = e.target.value.split("\n").length;
+              e.target.style.height = `${Math.min(lineCount, 4) * 1}rem`;
             }}
             onKeyDown={(e) => {
               if (e.key === "Enter" && !e.shiftKey) {
                 e.preventDefault();
                 handleSend();
+                e.target.style.height = "1rem";
               }
             }}
-            className={`${styles.messageInput} empty`}
-            style={{}}
+            className={`${styles.messageInput}`}
+            style={{
+              overflowY: "auto",
+              resize: "none",
+            }}
           />
           <div className={styles.inputActions}>
             <Send className={styles.icon} onClick={handleSend} />

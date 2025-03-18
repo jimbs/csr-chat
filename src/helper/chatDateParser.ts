@@ -64,6 +64,25 @@ export const getCurrentDateTime = () => {
   return `${year}-${month}-${day} ${hours}:${minutes}`;
 };
 
+export const getAMonthRangeOfDate = (dateStr: string = new Date().toISOString()) => {
+  const date = new Date(dateStr);
+  const currentDate = new Date(date);
+  const previousMonth = new Date(date.setMonth(date.getMonth() - 1));
+  
+  const fromYear = previousMonth.getFullYear();
+  const fromMonth = String(previousMonth.getMonth() + 1).padStart(2, "0");
+  const fromDay = String(previousMonth.getDate()).padStart(2, "0");
+  
+  const toYear = currentDate.getFullYear();
+  const toMonth = String(currentDate.getMonth() + 1).padStart(2, "0");
+  const toDay = String(currentDate.getDate()).padStart(2, "0");
+
+  return {
+    from: `${fromYear}-${fromMonth}-${fromDay} 00:00:00`,
+    to: `${toYear}-${toMonth}-${toDay} 23:59:59`
+  };
+};
+
 export const isDateEqual = (date1: string, date2: string): boolean => {
   const d1 = new Date(date1);
   const d2 = new Date(date2);

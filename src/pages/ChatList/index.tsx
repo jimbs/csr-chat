@@ -6,144 +6,19 @@ import { PollingService } from "../../services/pollingService";
 import {
   formatMessageDate,
   formatMessageTime,
+  getAMonthRangeOfDate,
 } from "../../helper/chatDateParser";
-
-const sampleMessages = [
-  {
-    id: "jode7891990",
-    name: "jode7891990",
-    message: "Withdrawal Concern",
-    time: "Today 10:06AM",
-    avatar: "https://placehold.co/50",
-    status: "online",
-  },
-  {
-    id: "masa8172000",
-    name: "masa8172000",
-    message: "Deposit Concern",
-    time: "Today 10:06AM",
-    avatar: "https://placehold.co/50",
-    status: "online",
-    unread: 2,
-  },
-  {
-    id: "locr2221984",
-    name: "locr2221984",
-    message: "Hello po!",
-    time: "Today 09:23AM",
-    avatar: "https://placehold.co/50",
-    status: "offline",
-    unread: 2,
-  },
-  {
-    id: "guest_3",
-    name: "guest_1",
-    message: "Paano manalo dito?",
-    time: "Today 08:15AM",
-    avatar: "https://placehold.co/50",
-    status: "offline",
-  },
-  {
-    id: "guest_1",
-    name: "guest_1",
-    message: "Paano manalo dito?",
-    time: "Today 08:15AM",
-    avatar: "https://placehold.co/50",
-    status: "offline",
-  },
-  {
-    id: "guest_2",
-    name: "guest_1",
-    message: "Paano manalo dito?",
-    time: "Today 08:15AM",
-    avatar: "https://placehold.co/50",
-    status: "offline",
-  },
-  {
-    id: "jajo9902001",
-    name: "jajo9902001",
-    message: "Okay bye. Thanks.",
-    time: "Yesterday",
-    avatar: "https://placehold.co/50",
-    status: "offline",
-    rating: "😄",
-  },
-  {
-    id: "jajo9902002",
-    name: "jajo9902001",
-    message: "Okay bye. Thanks.",
-    time: "Yesterday",
-    avatar: "https://placehold.co/50",
-    status: "offline",
-    rating: "😄",
-  },
-  {
-    id: "jajo9902003",
-    name: "jajo9902001",
-    message: "Okay bye. Thanks.",
-    time: "Yesterday",
-    avatar: "https://placehold.co/50",
-    status: "offline",
-    rating: "😄",
-  },
-  {
-    id: "jajo9902004",
-    name: "jajo9902001",
-    message: "Okay bye. Thanks.",
-    time: "Yesterday",
-    avatar: "https://placehold.co/50",
-    status: "offline",
-    rating: "😄",
-  },
-  {
-    id: "jajo9902001_1",
-    name: "jajo9902001",
-    message: "Okay bye. Thanks.",
-    time: "Yesterday",
-    avatar: "https://placehold.co/50",
-    status: "offline",
-    rating: "😄",
-  },
-  {
-    id: "jajo9902001_2",
-    name: "jajo9902001", // keeping the display name same
-    message: "Okay bye. Thanks.",
-    time: "Yesterday",
-    avatar: "https://placehold.co/50",
-    status: "offline",
-    rating: "😄",
-  },
-  {
-    id: "jajo9902001_3",
-    name: "jajo9902001", // keeping the display name same
-    message: "Okay bye. Thanks.",
-    time: "Yesterday",
-    avatar: "https://placehold.co/50",
-    status: "offline",
-    rating: "😄",
-  },
-  {
-    id: "jajo9902005",
-    name: "jajo9902001",
-    message: "Okay bye. Thanks.",
-    time: "Yesterday",
-    avatar: "https://placehold.co/50",
-    status: "offline",
-    rating: "😄",
-  },
-];
 
 const token =
   "Pl813FYaeWqsXcT1KtTKBWZLMnAyNGh6UmQ4cXEwUE1UVG1xdTk0aVJ4enlXRS8vdnU5UllpUGRQZFVvSkIrOHlwMmwrYk5Ba2czb3hDQ1JtdTlWRkJvRFJZejFNcnAyMGRxNHozK3J3OVVhTU80ZDZEcm5lZ1Z0TWUwYnlVbmNuSG54Z29KcjR0UWc4STFuU0l6TWtPN2g3Q2Z5ZTVCTE1ZS0VrQT09";
 const user_id = -5;
 
-// Update the component to accept filterBadge as a prop
 export const ChatList: React.FC<{
   filterBadge?: string;
   selectedTicket?: string;
   setFilterBadge: React.Dispatch<React.SetStateAction<string>>;
-}> = ({ filterBadge, selectedTicket, setFilterBadge }) => {
-  // Use filterBadge in your component logic to filter the chat list
+  onTicketsChange?: (tickets: { [param: string]: any }) => void;
+}> = ({ filterBadge, selectedTicket, setFilterBadge, onTicketsChange }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const [initialLoad, setInitialLoad] = useState(false);
@@ -154,12 +29,10 @@ export const ChatList: React.FC<{
 
   const handleResize = () => {
     if (window.innerWidth <= 768 && selectedTicket) {
-      console.log(true)
       polling.stop();
       return;
     }
-      console.log(false)
-      polling.start();
+    polling.start();
   };
 
   const isLoadedConversation = (id: string) => {
@@ -173,14 +46,15 @@ export const ChatList: React.FC<{
       new PollingService(
         async () => {
           try {
+            const range = getAMonthRangeOfDate();
             const response = await fetch("/api/get-csr-tickets", {
               method: "POST",
               body: JSON.stringify({
                 data: {
                   user_id: user_id,
                   status: filterBadge, // If Pending was used, it will not locked to the csr, all  will be visible, other statuses, only the csr assigned will see it.
-                  date_from: "2024-02-15 00:00:00",
-                  date_to: "2025-03-15 23:50:17",
+                  date_from: range.from,
+                  date_to: range.to,
                   limit: 10, // put -1 for limitless
                 },
               }),
@@ -190,7 +64,16 @@ export const ChatList: React.FC<{
               },
             });
             const newMessages = await response.json();
-            return newMessages;
+            const sortedMessages = {
+              ...newMessages,
+              data: newMessages.data.sort((a: any, b: any) => {
+                return (
+                  new Date(b.latest_ticket_message.date_created).getTime() -
+                  new Date(a.latest_ticket_message.date_created).getTime()
+                );
+              }),
+            };
+            return sortedMessages;
           } catch (error) {
             console.error("Error fetching new messages:", error);
             throw error;
@@ -198,7 +81,6 @@ export const ChatList: React.FC<{
         },
         (newMessages) => {
           if (newMessages.status_code == 200) {
-            // Filter duplicates by message id
             setTickets(newMessages.data);
             if (isLoading) {
               setIsLoading(false);
@@ -210,7 +92,7 @@ export const ChatList: React.FC<{
     [filterBadge]
   );
 
-  const handleTakeTicket = async (ticket_num: string) => {
+  const handleTakeTicket = async (ticket_num: string, player: any) => {
     try {
       setTakingTicket(true);
       const response = await fetch("/api/update-ticket-status", {
@@ -245,6 +127,7 @@ export const ChatList: React.FC<{
         });
         setFilterBadge("In Progress");
         navigate(`/${ticket_num}`);
+        onTicketsChange(player);
         setTakingTicket(false);
       }
     } catch (error) {
@@ -254,9 +137,26 @@ export const ChatList: React.FC<{
     }
   };
 
-  const handleSelect = (id: string) => {
+  const nameToDisplay = (obj: any) => {
+    console.log(obj);
+    const { customer_details } = obj;
+    if (!customer_details) return obj.ticket_number;
+
+    if (customer_details.first_name && customer_details.last_name) {
+      return `${customer_details.first_name} ${customer_details.last_name}`;
+    } else if (customer_details.first_name) {
+      return customer_details.first_name;
+    } else if (customer_details.last_name) {
+      return customer_details.last_name;
+    } else {
+      return "Unknown";
+    }
+  };
+
+  const handleSelect = (id: string, player: any) => {
     if (filterBadge === "Pending") return;
     navigate(`/${id}`);
+    onTicketsChange(player);
   };
 
   useEffect(() => {
@@ -350,7 +250,9 @@ export const ChatList: React.FC<{
             <div
               key={chat.id}
               className={styles.chatItem}
-              onClick={() => handleSelect(chat.ticket_number)}
+              onClick={() =>
+                handleSelect(chat.ticket_number, chat.customer_details)
+              }
               style={{
                 backgroundColor: isLoadedConversation(chat.ticket_number)
                   ? "#FFFAD1"
@@ -376,7 +278,7 @@ export const ChatList: React.FC<{
               </div>
               <div className={styles.chatInfo}>
                 <div className={styles.chatHeader}>
-                  <span className={styles.userName}>{chat.ticket_number}</span>
+                  <span className={styles.userName}>{nameToDisplay(chat)}</span>
                   <span className={styles.timeStamp}>
                     {formatMessageDate(chat.date_modified, {
                       time_context: true,
@@ -386,7 +288,11 @@ export const ChatList: React.FC<{
                   </span>
                 </div>
                 <div className={styles.messagePreview}>
-                  <p>{chat.concern_type}</p>
+                  <p>
+                    {chat.latest_ticket_message?.message
+                      .split(/\n|\\n/)
+                      .join(" ") ?? chat.concern_type}
+                  </p>
                   {chat.rating && (
                     <span className={styles.rating}>Rated: {chat.rating}</span>
                   )}
@@ -400,8 +306,11 @@ export const ChatList: React.FC<{
                   onClick={async (e) => {
                     e.stopPropagation();
                     if (takingTicket) return;
-                    // Add your take ticket logic here
-                    await handleTakeTicket(chat.ticket_number);
+
+                    await handleTakeTicket(
+                      chat.ticket_number,
+                      chat.customer_details
+                    );
                   }}
                   disabled={takingTicket}
                 >
