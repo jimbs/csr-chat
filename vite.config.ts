@@ -6,7 +6,8 @@ export default defineConfig({
   server: {
     proxy: {
       "/api": {
-        target: "http://karera_v2_api.test/api",
+        target: "https://devtwo-api.karera.live/api",
+        // target: "http://karera_v2_api.test/api",
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/api/, ""),
         configure: async (proxy, options) => {
