@@ -1,18 +1,21 @@
 import "./styles.module.scss";
 import React, { useState, useEffect, useRef, useMemo } from "react";
-import { AttachFile, EmojiEmotions, Send } from "@mui/icons-material";
+import { Send } from "@mui/icons-material";
 import styles from "./styles.module.scss";
 import {
-  isDateEqual,
   formatMessageDate,
   formatMessageTime,
   getCurrentDateTime,
 } from "../../helper/chatDateParser";
 import { PollingService } from "../../services/pollingService";
 import { useParams } from "react-router-dom";
+import { apiCall } from "../Services/APICalls";
 
+<<<<<<< Updated upstream
 const token =
   "JZImtn9M2nIRNszBBOE9uVnM0SUo0dCtLeFdvbno5aWJmL2hVLzhha1MzV29GWk9udnVTTkZ2QW1TaEFNU21BSTRUOHlCTGcrSllFTHdMZk1rcTRZMUgwMUhCdUVqSGJqOEpCekUyL2FlQlJySlBXN0RzS3lRSEVjV0Y5UkViTnhyUW9IN0xRR2pZdFlPZ21Kdi91elNBMjRMbEk0VzgwZz09";
+=======
+>>>>>>> Stashed changes
 const user_id = -5;
 
 export const Chat: React.FC = () => {
@@ -23,13 +26,8 @@ export const Chat: React.FC = () => {
   const [data, setData] = useState<any>(null);
   const { ticket_number } = useParams();
 
-  const player_details = useMemo(
-    () => messages[0]?.player_details ?? null,
-    [ticket_number]
-  );
-
   const messagesList = useMemo(() => {
-    const sorted_data = messages
+    const sorted_data = [...messages, ...sendingMessages]
       .map((msg: any) =>
         msg.date_created
           ? {
@@ -45,26 +43,22 @@ export const Chat: React.FC = () => {
           new Date(b.date_created).getTime()
       );
     return sorted_data;
-  }, [messages]);
+  }, [messages, sendingMessages]);
+
   const polling = useMemo(
     () =>
       new PollingService(
         async () => {
           try {
-            const response = await fetch("/api/get-ticket-messages", {
-              method: "POST",
-              body: JSON.stringify({
+            const newMessages = await apiCall({
+              data: {
+                endpoint: "get-ticket-messages",
                 data: {
                   ticket_number: ticket_number,
                   user_id: user_id,
                 },
-              }),
-              headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${token}`,
               },
             });
-            const newMessages = await response.json();
             return newMessages;
           } catch (error) {
             console.error("Error fetching new messages:", error);
@@ -94,31 +88,8 @@ export const Chat: React.FC = () => {
                       msg.id == _msg.ticket_message_number
                   );
                 });
-              let _newMessages = prevMessages.filter((msg: any) => {
-                if (msg.uuid) {
-                  const sending = sendingMessages.find(
-                    (_: any) => _.uuid == msg.uuid
-                  );
-                  const isExist = existingIds.has(
-                    sending?.ticket_message_id.toString()
-                  );
-                  if (isExist) {
-                    updateSendingMessages(() => {
-                      let clone = [...sendingMessages];
-                      clone.splice(
-                        clone.findIndex((_: any) => _.uuid == msg.uuid),
-                        1
-                      );
-                      return clone;
-                    });
-                    return !isExist;
-                  }
-                  return true;
-                }
-                return true;
-              });
 
-              return [..._newMessages, ...uniqueNewMessages];
+              return [...prevMessages, ...uniqueNewMessages];
             });
           }
         },
@@ -128,10 +99,12 @@ export const Chat: React.FC = () => {
   );
 
   useEffect(() => {
-    setMessages(() => []);
+    setMessages([]); // Clear messages when ticket_number changes
+    setTimeout(() => {
+      scrollToBottom(true);
+    }, 300);
     polling.start();
 
-    scrollToBottom();
     return () => {
       if (polling.isActive()) {
         polling.stop();
@@ -139,10 +112,10 @@ export const Chat: React.FC = () => {
     };
   }, [ticket_number]);
 
-  const uuid = Math.random().toString(36).substr(2, 9);
-
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  const scrollToBottom = (quick?: boolean) => {
+    messagesEndRef.current?.scrollIntoView({
+      behavior: quick ? "auto" : "smooth",
+    });
   };
 
   const handleSend = async () => {
@@ -155,25 +128,21 @@ export const Chat: React.FC = () => {
         ticket_number: ticket_number,
         date_created: getCurrentDateTime(),
       };
-      setMessages((prevMessages: any) => [...prevMessages, newMessage]);
+
+      updateSendingMessages((prevMessages: any) => [
+        ...prevMessages,
+        newMessage,
+      ]);
       setMessage("");
-      const res = await fetch("/api/send-ticket-message", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({ data: newMessage }),
+
+      const _data = await apiCall({
+        data: { data: newMessage, endpoint: "send-ticket-message" },
       });
-      const _data = await res.json();
 
       if (_data.status_code == 201) {
-        setTimeout(() => scrollToBottom(), 800);
-
-        updateSendingMessages((prev: any) => [
-          ...prev,
-          { uuid, ..._data.data },
-        ]);
+        updateSendingMessages((prev: any) =>
+          prev.filter((_: any) => _.uuid != uuid)
+        );
       }
     }
   };
@@ -234,19 +203,23 @@ export const Chat: React.FC = () => {
                 )}
 
                 <p>
-                  {msg.message.split(/\n|\\n/).map((line: any, index: any) => (
-                    <React.Fragment
-                      key={`${line
-                        .trim()
-                        .split("")
-                        .sort()
-                        .join("")
-                        .substring(0, 6)}${index}`}
-                    >
-                      {line}
-                      {index < msg.message.split(/\n|\\n/).length - 1 && <br />}
-                    </React.Fragment>
-                  ))}
+                  {msg.message.split(/\n|\\n/).map((line: any, index: any) => {
+                    return (
+                      <React.Fragment
+                        key={`${line
+                          .trim()
+                          .split("")
+                          .sort()
+                          .join("")
+                          .substring(0, 6)}${index}`}
+                      >
+                        {line}
+                        {index < msg.message.split(/\n|\\n/).length - 1 && (
+                          <br />
+                        )}
+                      </React.Fragment>
+                    );
+                  })}
                 </p>
               </div>
             </div>

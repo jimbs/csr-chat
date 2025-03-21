@@ -67,6 +67,6 @@
     "ts-node-dev": "^2.0.0",
     "tsconfig-paths": "^4.2.0",
     "typescript": "^5.7.3",
-    "vite": "^5.4.14"
+    "vite": "^6.2.2"
   }
 }

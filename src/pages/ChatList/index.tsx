@@ -1,16 +1,20 @@
 import React, { useEffect, useMemo, useState } from "react";
 import styles from "./styles.module.scss";
 import "./styles.module.scss";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigate, useLocation, useParams } from "react-router-dom";
 import { PollingService } from "../../services/pollingService";
 import {
   formatMessageDate,
   formatMessageTime,
   getAMonthRangeOfDate,
 } from "../../helper/chatDateParser";
+import { apiCall } from "../Services/APICalls";
 
+<<<<<<< Updated upstream
 const token =
   "JZImtn9M2nIRNszBBOE9uVnM0SUo0dCtLeFdvbno5aWJmL2hVLzhha1MzV29GWk9udnVTTkZ2QW1TaEFNU21BSTRUOHlCTGcrSllFTHdMZk1rcTRZMUgwMUhCdUVqSGJqOEpCekUyL2FlQlJySlBXN0RzS3lRSEVjV0Y5UkViTnhyUW9IN0xRR2pZdFlPZ21Kdi91elNBMjRMbEk0VzgwZz09";
+=======
+>>>>>>> Stashed changes
 const user_id = -5;
 
 export const ChatList: React.FC<{
@@ -25,6 +29,7 @@ export const ChatList: React.FC<{
   const [isLoading, setIsLoading] = useState(false);
   const [takingTicket, setTakingTicket] = useState(false);
   const [tickets, setTickets] = useState<any>([]);
+  const { ticket_number } = useParams();
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
 
   const handleResize = () => {
@@ -47,9 +52,9 @@ export const ChatList: React.FC<{
         async () => {
           try {
             const range = getAMonthRangeOfDate();
-            const response = await fetch("/api/get-csr-tickets", {
-              method: "POST",
-              body: JSON.stringify({
+            const newMessages = await apiCall({
+              data: {
+                endpoint: "get-csr-tickets",
                 data: {
                   user_id: user_id,
                   status: filterBadge, // If Pending was used, it will not locked to the csr, all  will be visible, other statuses, only the csr assigned will see it.
@@ -57,13 +62,8 @@ export const ChatList: React.FC<{
                   date_to: range.to,
                   limit: 10, // put -1 for limitless
                 },
-              }),
-              headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${token}`,
               },
             });
-            const newMessages = await response.json();
             const sortedMessages = {
               ...newMessages,
               data: newMessages.data.sort((a: any, b: any) => {
@@ -138,7 +138,6 @@ export const ChatList: React.FC<{
   };
 
   const nameToDisplay = (obj: any) => {
-    console.log(obj);
     const { customer_details } = obj;
     if (!customer_details) return obj.ticket_number;
 
@@ -154,7 +153,7 @@ export const ChatList: React.FC<{
   };
 
   const handleSelect = (id: string, player: any) => {
-    if (filterBadge === "Pending") return;
+    if (filterBadge === "Pending" || id == ticket_number) return;
     navigate(`/${id}`);
     onTicketsChange(player);
   };
