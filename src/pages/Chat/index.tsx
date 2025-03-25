@@ -10,21 +10,18 @@ import {
 import { PollingService } from "../../services/pollingService";
 import { useParams } from "react-router-dom";
 import { apiCall } from "../Services/APICalls";
-
-<<<<<<< Updated upstream
-const token =
-  "JZImtn9M2nIRNszBBOE9uVnM0SUo0dCtLeFdvbno5aWJmL2hVLzhha1MzV29GWk9udnVTTkZ2QW1TaEFNU21BSTRUOHlCTGcrSllFTHdMZk1rcTRZMUgwMUhCdUVqSGJqOEpCekUyL2FlQlJySlBXN0RzS3lRSEVjV0Y5UkViTnhyUW9IN0xRR2pZdFlPZ21Kdi91elNBMjRMbEk0VzgwZz09";
-=======
->>>>>>> Stashed changes
-const user_id = -5;
+import { checkCredentials } from "../Services/Backend/storeLocalData";
+import { useNavigate } from "react-router-dom";
 
 export const Chat: React.FC = () => {
+  const navigate = useNavigate();
   const [message, setMessage] = useState<any>("");
   const messagesEndRef = useRef<null | HTMLDivElement>(null);
   const [messages, setMessages] = useState<any>([]);
   const [sendingMessages, updateSendingMessages] = useState<any>([]);
   const [data, setData] = useState<any>(null);
   const { ticket_number } = useParams();
+  const user_id = parseInt(localStorage.getItem("user_id"));
 
   const messagesList = useMemo(() => {
     const sorted_data = [...messages, ...sendingMessages]
@@ -99,6 +96,11 @@ export const Chat: React.FC = () => {
   );
 
   useEffect(() => {
+    if (!checkCredentials()) {
+      navigate("/login");
+      return
+    }
+
     setMessages([]); // Clear messages when ticket_number changes
     setTimeout(() => {
       scrollToBottom(true);

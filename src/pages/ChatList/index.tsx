@@ -8,21 +8,21 @@ import {
   formatMessageTime,
   getAMonthRangeOfDate,
 } from "../../helper/chatDateParser";
-import { apiCall } from "../Services/APICalls";
+import { apiCall, apiCallLocal } from "../Services/APICalls";
+import {
+  checkCredentials,
+  clearLocalData,
+} from "../Services/Backend/storeLocalData";
 
-<<<<<<< Updated upstream
-const token =
-  "JZImtn9M2nIRNszBBOE9uVnM0SUo0dCtLeFdvbno5aWJmL2hVLzhha1MzV29GWk9udnVTTkZ2QW1TaEFNU21BSTRUOHlCTGcrSllFTHdMZk1rcTRZMUgwMUhCdUVqSGJqOEpCekUyL2FlQlJySlBXN0RzS3lRSEVjV0Y5UkViTnhyUW9IN0xRR2pZdFlPZ21Kdi91elNBMjRMbEk0VzgwZz09";
-=======
->>>>>>> Stashed changes
 const user_id = -5;
 
 export const ChatList: React.FC<{
+  csrId: number | null;
   filterBadge?: string;
   selectedTicket?: string;
   setFilterBadge: React.Dispatch<React.SetStateAction<string>>;
   onTicketsChange?: (tickets: { [param: string]: any }) => void;
-}> = ({ filterBadge, selectedTicket, setFilterBadge, onTicketsChange }) => {
+}> = ({ csrId, filterBadge, selectedTicket, setFilterBadge, onTicketsChange }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const [initialLoad, setInitialLoad] = useState(false);
@@ -31,13 +31,14 @@ export const ChatList: React.FC<{
   const [tickets, setTickets] = useState<any>([]);
   const { ticket_number } = useParams();
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
+  const [userDetails, setUserDetails] = useState<any>(null);
 
   const handleResize = () => {
     if (window.innerWidth <= 768 && selectedTicket) {
       polling.stop();
       return;
     }
-    polling.start();
+    if (csrId) polling.start();
   };
 
   const isLoadedConversation = (id: string) => {
@@ -95,34 +96,25 @@ export const ChatList: React.FC<{
   const handleTakeTicket = async (ticket_num: string, player: any) => {
     try {
       setTakingTicket(true);
-      const response = await fetch("/api/update-ticket-status", {
-        method: "POST",
-        body: JSON.stringify({
+      const newMessages = await apiCall({
+        data: {
           data: {
             user_id: user_id,
             status: "In Progress",
             ticket_number: ticket_num,
           },
-        }),
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
+          endpoint: "update-ticket-status",
         },
       });
-      const newMessages = await response.json();
       if (newMessages.status_code == 200) {
-        const response = await fetch("/api/send-ticket-message", {
-          method: "POST",
-          body: JSON.stringify({
+        await apiCall({
+          data: {
             data: {
               user_id: user_id,
               ticket_number: ticket_num,
               message: "Hi this is csr_1 happy to serve you.",
             },
-          }),
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
+            endpoint: "send-ticket-message",
           },
         });
         setFilterBadge("In Progress");
@@ -158,8 +150,23 @@ export const ChatList: React.FC<{
     onTicketsChange(player);
   };
 
+  const setUserDetailsLocal = () => {
+    if (localStorage.getItem("user_data") == "undefined") return null;
+    return JSON.parse(localStorage.getItem("user_data"));
+  };
+
   useEffect(() => {
     handleResize();
+    if (!checkCredentials()) navigate("/login");
+
+    if (!userDetails) {
+      if (!setUserDetailsLocal()) {
+        clearLocalData();
+        navigate("/login");
+        return;
+      }
+      setUserDetails(setUserDetailsLocal());
+    }
 
     if (!initialLoad) {
       handleResize();
@@ -170,7 +177,7 @@ export const ChatList: React.FC<{
       polling.stop();
       window.removeEventListener("resize", handleResize);
     };
-  }, [filterBadge, selectedTicket]);
+  }, [filterBadge, selectedTicket, csrId]);
 
   return (
     <div className={styles.chatList}>

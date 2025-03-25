@@ -2,6 +2,8 @@ import React, { useEffect, useMemo, useState } from "react";
 import styles from "./styles.module.scss";
 import { Outlet, useLocation, useParams } from "react-router-dom";
 import { ChatList } from "../ChatList";
+import { checkCredentials, clearLocalData } from "../Services/Backend/storeLocalData";
+import { useNavigate } from "react-router-dom";
 
 const filters = [
   { label: "Pending", value: "Pending", class: "all" },
@@ -11,16 +13,33 @@ const filters = [
 ];
 
 export const CSR: React.FC = () => {
+  const navigate = useNavigate();
   const [isMobileListVisible, setIsMobileListVisible] = useState(false);
   const [filterBadge, setFilterBadge] = useState("Pending");
   const { ticket_number } = useParams();
+  const [csrDetails, setCsrDetails] = useState(null);
   const [playerDetails, setPlayerDetails] = useState({
     first_name: "John",
     last_name: "Doe",
   });
 
 
+  const setUserDetailsLocal = () => {
+    if (localStorage.getItem("user_data") == "undefined") return null;
+    return JSON.parse(localStorage.getItem("user_data"));
+  };
+
   useEffect(() => {
+    if (!checkCredentials()) navigate("/login");
+
+    if (!csrDetails) {
+      if(!setUserDetailsLocal()) {
+        clearLocalData();
+        navigate("/login");
+        return;
+      }
+      setCsrDetails(setUserDetailsLocal());
+    }
     if (window.innerWidth <= 768) {
       setIsMobileListVisible(true);
     } else {
@@ -30,7 +49,7 @@ export const CSR: React.FC = () => {
 
   return (
     <div className={styles.CSR}>
-      <Header />
+      <Header csr={csrDetails} />
       <div className={styles.mainContent}>
         <div
           className={`${styles.leftPanel} ${`${styles.listWrapper} ${
@@ -43,6 +62,7 @@ export const CSR: React.FC = () => {
               setFilterBadge={setFilterBadge}
             />
             <ChatList
+              csrId={csrDetails?.id}
               filterBadge={filterBadge}
               selectedTicket={ticket_number}
               setFilterBadge={setFilterBadge}
@@ -70,7 +90,8 @@ export const CSR: React.FC = () => {
   );
 };
 
-const Header: React.FC = () => {
+const Header: React.FC = ({csr} : any) => {
+  console.log(csr)
   return (
     <header className={styles.headerContainer}>
       <div className={styles.leftSection}>
@@ -80,8 +101,8 @@ const Header: React.FC = () => {
 
         {/* User Info */}
         <div className={styles.userInfo}>
-          <p className={styles.userName}>CS Princess</p>
-          <p className={styles.userId}>User ID: 0d5393c2-a155-3123216</p>
+          <p className={styles.userName}>{csr?.first_name || "CSR"} {csr?.last_name || "Name"}</p>
+          <p className={styles.userId}>User ID: {csr?.id}</p>
         </div>
       </div>
 
