@@ -39,6 +39,7 @@ export const apiCall = async (payload, token?) => {
       payload.data.endpoint == "login"
         ? ""
         : token || localStorage.getItem("auth_token");
+
     //@ts-ignore
     const url = `${import.meta.env.VITE_API_URL}/api/apiservice`;
     const response = await fetch(url, {
