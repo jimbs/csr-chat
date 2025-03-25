@@ -1,432 +1,617 @@
 .CSR {
-    display: flex;
-    flex-direction: column;
-    font-family: Arial, sans-serif;
+  display: flex;
+  flex-direction: column;
+  font-family: Arial, sans-serif;
 }
 
 .mainContent {
-    display: grid;
-    grid-template-columns: minmax(300px, 1fr) 3fr;
-    height: calc(100vh - 70px);
-    gap: 1px;
-    background: #fff;
+  display: grid;
+  grid-template-columns: minmax(300px, 1fr) 3fr;
+  height: calc(100vh - 70px);
+  gap: 1px;
+  background: #fff;
 
-    .leftPanel,
-    .rightPanel {
-        display: flex;
-        flex-direction: column;
-        height: 100%;
-    }
+  .leftPanel,
+  .rightPanel {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+  }
+
+  .leftPanel {
+    border-right: 1px solid #e0e0e0;
+  }
+
+  .listWrapper {
+    flex: 1;
+    overflow-y: auto;
+  }
+
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
 
     .leftPanel {
-        border-right: 1px solid #e0e0e0;
+      position: fixed;
+      left: 0;
+      top: 70px;
+      width: 100%;
+      height: calc(100vh - 70px);
+      background: white;
+      z-index: 20;
+      transform: translateX(-100%);
+      transition: transform 0.3s ease;
+
+      &.visible {
+        transform: translateX(0);
+      }
     }
-
-    .listWrapper {
-        flex: 1;
-        overflow-y: auto;
-    }
-
-    @media (max-width: 768px) {
-        grid-template-columns: 1fr;
-
-        .leftPanel {
-            position: fixed;
-            left: 0;
-            top: 70px;
-            width: 100%;
-            height: calc(100vh - 70px);
-            background: white;
-            z-index: 20;
-            transform: translateX(-100%);
-            transition: transform 0.3s ease;
-
-            &.visible {
-                transform: translateX(0);
-            }
-        }
-    }
+  }
 }
 
 .headerContainer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #d11a2a;
+  padding: 10px 20px;
+  color: #fff;
+  width: 100%;
+  margin: 0;
+  // position: fixed;
+  top: 0;
+  left: 0;
+  box-sizing: border-box;
+  z-index: 12;
+
+  & .profilePicture {
+    overflow: hidden;
+    width: 50px;
+    height: 50px;
+    background-color: #fff;
+    border-radius: 50%;
+    margin-right: 10px;
+  }
+
+  & .userInfo {
     display: flex;
-    justify-content: space-between;
-    align-items: center;
-    background-color: #d11a2a;
-    padding: 10px 20px;
-    color: #fff;
-    width: 100%;
-    margin: 0;
-    // position: fixed;
-    top: 0;
-    left: 0;
-    box-sizing: border-box;
-    z-index: 12;
+    flex-direction: column;
 
-    & .profilePicture {
-        overflow: hidden;
-        width: 50px;
-        height: 50px;
-        background-color: #fff;
-        border-radius: 50%;
-        margin-right: 10px;
+    & .userName {
+      font-size: 18px;
+      font-weight: bold;
+      margin: 0;
     }
 
-    & .userInfo {
-        display: flex;
-        flex-direction: column;
-
-        & .userName {
-            font-size: 18px;
-            font-weight: bold;
-            margin: 0;
-        }
-
-        & .userId {
-            font-size: 14px;
-            margin: 0;
-            color: #FFF;
-        }
+    & .userId {
+      font-size: 14px;
+      margin: 0;
+      color: #fff;
     }
-
-
-
+  }
 }
 
 .leftSection {
-    display: flex;
-    align-items: center;
+  display: flex;
+  align-items: center;
 }
 
 .hamburgerMenu {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
 }
 
 .menuIcon {
-    width: 3rem;
-    /* Adjust the size of the icon */
-    height: auto;
-    aspect-ratio: 1/1;
+  width: 3rem;
+  /* Adjust the size of the icon */
+  height: auto;
+  aspect-ratio: 1/1;
 }
 
 .sidebar {
-    width: 300px;
-    background: #f9f9f9;
-    border-right: 1px solid #ddd;
-    display: flex;
-    flex-direction: column;
-    height: 100vh;
+  width: 300px;
+  background: #f9f9f9;
+  border-right: 1px solid #ddd;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
 }
 
 .tabs {
-    display: flex;
-    justify-content: space-around;
-    padding: 10px 0;
-    background: #fff;
-    border-bottom: 1px solid #ddd;
+  display: flex;
+  justify-content: space-around;
+  padding: 10px 0;
+  background: #fff;
+  border-bottom: 1px solid #ddd;
 }
 
 .tabs button {
-    flex: 1;
-    padding: 10px;
-    border: none;
-    background: transparent;
-    cursor: pointer;
-    font-size: 14px;
+  flex: 1;
+  padding: 10px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  font-size: 14px;
 }
 
 .tabs .active {
-    color: #fff;
-    background: #0ca82e;
-    border-radius: 5px;
+  color: #fff;
+  background: #0ca82e;
+  border-radius: 5px;
 }
 
 .conversations {
-    overflow-y: auto;
-    flex: 1;
+  overflow-y: auto;
+  flex: 1;
 }
 
 .conversation {
-    display: flex;
-    align-items: center;
-    padding: 10px;
-    border-bottom: 1px solid #ddd;
-    cursor: pointer;
+  display: flex;
+  align-items: center;
+  padding: 10px;
+  border-bottom: 1px solid #ddd;
+  cursor: pointer;
 }
 
 .conversation:hover {
-    background: #f5f5f5;
+  background: #f5f5f5;
 }
 
 .avatar {
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    background: #ccc;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-right: 10px;
-    font-size: 16px;
-    font-weight: bold;
-    color: #fff;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: #ccc;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 10px;
+  font-size: 16px;
+  font-weight: bold;
+  color: #fff;
 }
 
 .details {
-    flex: 1;
+  flex: 1;
 }
 
 .name {
-    font-weight: bold;
-    margin: 0;
+  font-weight: bold;
+  margin: 0;
 }
 
 .message {
-    margin: 0;
-    font-size: 12px;
-    color: #555;
+  margin: 0;
+  font-size: 12px;
+  color: #555;
 }
 
 .time {
-    font-size: 10px;
-    color: #888;
+  font-size: 10px;
+  color: #888;
 }
 
 .chatArea {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    height: 100vh;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
 }
 
 .noConversation {
-    flex: 1;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: #888;
-    font-size: 18px;
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #888;
+  font-size: 18px;
 }
 
 .messageBox {
-    display: flex;
-    align-items: center;
-    padding: 10px;
-    border-top: 1px solid #ddd;
+  display: flex;
+  align-items: center;
+  padding: 10px;
+  border-top: 1px solid #ddd;
 }
 
 .input {
-    flex: 1;
-    padding: 10px;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-    margin-right: 10px;
+  flex: 1;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  margin-right: 10px;
 }
 
 .sendButton {
-    padding: 10px 20px;
-    background: #0ca82e;
-    color: #fff;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
+  padding: 10px 20px;
+  background: #0ca82e;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
 }
 
 .noSelection {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100%;
-    color: #666;
-    font-size: 1.1rem;
-    border-left: 1px solid #e0e0e0; // Lighter, more subtle divider color
-    background-color: #f5f5f5; // Light background to differentiate the area
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  color: #666;
+  font-size: 1.1rem;
+  border-left: 1px solid #e0e0e0; // Lighter, more subtle divider color
+  background-color: #f5f5f5; // Light background to differentiate the area
 }
 
 .chatHeader {
-    position: sticky;
-    top: 0;
-    z-index: 10;
-    display: flex;
-    align-items: center;
-    padding: 8px 14px;
-    background: #fff;
-    border-bottom: 1px solid #e0e0e0;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  padding: 8px 14px;
+  background: #fff;
+  border-bottom: 1px solid #e0e0e0;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
 .userInfo {
-    h3 {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        font-weight: 200;
-        margin: 0;
-    }
+  h3 {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 200;
+    margin: 0;
+  }
 
-    .userId {
-        color: #888;
-        font-size: 12px;
-        margin-top: 5px;
-    }
+  .userId {
+    color: #888;
+    font-size: 12px;
+    margin-top: 5px;
+  }
 }
 
 .userAvatar {
-    position: relative;
-    width: 50px;
-    height: 50px;
-    margin-right: 1rem;
+  position: relative;
+  width: 50px;
+  height: 50px;
+  margin-right: 1rem;
 
-    & img {
-        border-radius: 50%;
-        width: 100%;
-    }
+  & img {
+    border-radius: 50%;
+    width: 100%;
+  }
 }
 
 .statusIndicator {
-    position: absolute;
-    bottom: 2px;
-    right: 2px;
-    width: 12px;
-    height: 12px;
-    border-radius: 50%;
-    border: 2px solid #fff;
+  position: absolute;
+  bottom: 2px;
+  right: 2px;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  border: 2px solid #fff;
 
-    &.online {
-        background-color: #00A24A;
-    }
+  &.online {
+    background-color: #00a24a;
+  }
 
-    &.offline {
-        background-color: #999;
-    }
+  &.offline {
+    background-color: #999;
+  }
 }
 
 .ticketInfo {
-    display: flex;
-    align-items: center;
-    margin-left: auto;
-    gap: 12px;
+  display: flex;
+  align-items: center;
+  margin-left: auto;
+  gap: 12px;
 }
 
 .ticketNumber {
-    font-size: 14px;
-    color: #666;
+  font-size: 14px;
+  color: #666;
 }
 
 .moreIcon {
-    width: 32px;
-    height: 32px;
-    cursor: pointer;
+  width: 32px;
+  height: 32px;
+  cursor: pointer;
 }
 
 .chatListHeader {
-    position: sticky;
-    top: 0;
-    z-index: 10;
-    display: flex;
-    align-items: center;
-    padding: 15px;
-    background: #fff;
-    border-bottom: 1px solid #e0e0e0;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  padding: 15px;
+  background: #fff;
+  border-bottom: 1px solid #e0e0e0;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
 .chatListHeader {
-    padding: 16px;
-    border-bottom: 1px solid #e0e0e0;
+  padding: 16px;
+  border-bottom: 1px solid #e0e0e0;
 }
 
 .badgeContainer {
-    display: inline-grid;
-    grid-template-columns: repeat(auto-fit, minmax(5rem, 1fr));
-    gap: .2rem;
-    width: 100%;
-    justify-content: space-evenly;
-    align-items: center;
-    flex-wrap: wrap;
+  display: inline-grid;
+  grid-template-columns: repeat(auto-fit, minmax(5rem, 1fr));
+  gap: 0.2rem;
+  width: 100%;
+  justify-content: space-evenly;
+  align-items: center;
+  flex-wrap: wrap;
 
-    .badge {
-        text-align: center;
-        white-space: nowrap;
-        padding: 4px 8px;
-        border-radius: 2rem;
-        cursor: pointer;
-    }
+  .badge {
+    text-align: center;
+    white-space: nowrap;
+    padding: 4px 8px;
+    border-radius: 2rem;
+    cursor: pointer;
+  }
 }
-
 
 .all,
 .new,
 .handled,
 .closed {
-    background-color: #E0E0E0;
-    color: #ffffff;
+  background-color: #e0e0e0;
+  color: #ffffff;
 }
 
 .all {
-    // background-color: #FFE40040;
-    // color: #00000040;
+  // background-color: #FFE40040;
+  // color: #00000040;
 
-    &:hover {
-        background-color: #FFE400;
-        color: #000;
-    }
+  &:hover {
+    background-color: #ffe400;
+    color: #000;
+  }
 
-    &.active {
-        background-color: #FFE400;
-        color: #000;
-    }
+  &.active {
+    background-color: #ffe400;
+    color: #000;
+  }
 }
 
 .new {
-    // background-color: #2196F340;
+  // background-color: #2196F340;
 
-    &:hover {
-        background-color: #2196F3;
-    }
+  &:hover {
+    background-color: #2196f3;
+  }
 
-    &.active {
-        background-color: #2196F3;
-    }
+  &.active {
+    background-color: #2196f3;
+  }
 }
 
-
 .handled {
-    // background-color: #00A24A40;
+  // background-color: #00A24A40;
 
-    &:hover {
-        background-color: #00A24A;
-    }
+  &:hover {
+    background-color: #00a24a;
+  }
 
-    &.active {
-        background-color: #00A24A;
-    }
+  &.active {
+    background-color: #00a24a;
+  }
 }
 
 .closed {
-    // background-color: #FF202040;
+  // background-color: #FF202040;
 
-    &:hover {
-        background-color: #FF2020;
-    }
+  &:hover {
+    background-color: #ff2020;
+  }
 
-    &.active {
-        background-color: #FF2020;
-    }
+  &.active {
+    background-color: #ff2020;
+  }
 }
 
 .mobileMenuButton {
-    display: none;
-    background: none;
-    border: none;
-    padding: 8px;
-    cursor: pointer;
-    margin-right: 8px;
+  display: none;
+  background: none;
+  border: none;
+  padding: 8px;
+  cursor: pointer;
+  margin-right: 8px;
 
-    @media (max-width: 768px) {
-        display: block;
-    }
+  @media (max-width: 768px) {
+    display: block;
+  }
+}
+
+// Add these styles to your existing styles.module.scss
+
+.sideMenu {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 100%;
+  z-index: 1000;
+  display: flex;
+  pointer-events: none;
+}
+
+.sideMenu.open {
+  pointer-events: auto;
+}
+
+.sideMenuOverlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.sideMenu.open .sideMenuOverlay {
+  opacity: 1;
+}
+
+.sideMenuContent {
+  position: absolute;
+  top: 0;
+  right: -320px;
+  width: 320px;
+  height: 100%;
+  background-color: white;
+  box-shadow: -2px 0 10px rgba(0, 0, 0, 0.1);
+  transition: right 0.3s ease;
+  display: flex;
+  flex-direction: column;
+}
+
+.sideMenu.open .sideMenuContent {
+  right: 0;
+}
+
+.sideMenuHeader {
+  font-family: "Baloo 2";
+  border-bottom: 1px solid #eee;
+  position: relative;
+}
+
+.closeButton {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  padding: 4px;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+.csrProfile {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 1rem;
+  padding: 2rem 1.1rem 0;
+}
+
+.csrProfileDetails {
+  font-family: "Baloo 2";
+  display: flex;
+  flex-direction: column;
+  align-items: start;
+
+  p,
+  h4 {
+    margin: 0;
+  }
+
+  p {
+    font-size: 0.8rem;
+    color: #666;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 160px; // Adjust this value as needed
+  }
+}
+
+.csrAvatar {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  margin-bottom: 10px;
+}
+
+.sideMenuOptions {
+  flex: 1;
+  padding: 20px;
+}
+
+.menuItem {
+  display: flex;
+  align-items: center;
+  padding: 15px 0;
+  border-bottom: 1px solid #eee;
+  cursor: pointer;
+}
+
+.menuItem img {
+  width: 24px;
+  height: 24px;
+  margin-right: 15px;
+}
+
+.menuItem span {
+  flex: 1;
+  font-size: 16px;
+}
+
+.toggle {
+  position: relative;
+  width: 50px;
+  height: 24px;
+}
+
+.toggle input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.toggle label {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ccc;
+  border-radius: 34px;
+  transition: 0.4s;
+  font-family: "Baloo 2";
+  font-weight: 600;
+}
+
+.toggle label:before {
+  position: absolute;
+  content: "";
+  height: 16px;
+  width: 16px;
+  left: 4px;
+  bottom: 4px;
+  background-color: white;
+  border-radius: 50%;
+  transition: 0.4s;
+}
+
+.toggle input:checked + label:after {
+  content: "On";
+  line-height: 26px;
+  padding-left: 6px;
+  color: #FFF;
+}
+
+.toggle input:checked + label {
+  background-color: #00a24a;
+}
+
+.toggle input + label:after {
+  content: "Off";
+  line-height: 26px;
+  padding-left: 1.35rem;
+  color: #000;
+}
+
+.toggle input:checked + label:before {
+  transform: translateX(26px);
+}
+
+.chevron {
+  width: 16px;
+  height: 16px;
 }

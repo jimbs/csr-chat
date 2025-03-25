@@ -17,12 +17,22 @@ import {
 const user_id = -5;
 
 export const ChatList: React.FC<{
-  csrId: number | null;
+  windowWidth: number | null;
   filterBadge?: string;
   selectedTicket?: string;
+  notifSound: boolean;
+  setNotifSound: React.Dispatch<React.SetStateAction<boolean>>;
   setFilterBadge: React.Dispatch<React.SetStateAction<string>>;
   onTicketsChange?: (tickets: { [param: string]: any }) => void;
-}> = ({ csrId, filterBadge, selectedTicket, setFilterBadge, onTicketsChange }) => {
+}> = ({
+  windowWidth,
+  filterBadge,
+  selectedTicket,
+  setFilterBadge,
+  onTicketsChange,
+  notifSound,
+  setNotifSound,
+}) => {
   const navigate = useNavigate();
   const location = useLocation();
   const [initialLoad, setInitialLoad] = useState(false);
@@ -38,7 +48,7 @@ export const ChatList: React.FC<{
       polling.stop();
       return;
     }
-    if (csrId) polling.start();
+    if (localStorage.getItem("user_id")) polling.start();
   };
 
   const isLoadedConversation = (id: string) => {
@@ -92,6 +102,30 @@ export const ChatList: React.FC<{
       ),
     [filterBadge]
   );
+
+  const fetchTickets = async (status) => {
+    try {
+      const range = getAMonthRangeOfDate();
+
+      const response = await apiCall({
+        data: {
+          endpoint: "get-csr-tickets",
+          data: {
+            user_id: user_id,
+            status: status, // If Pending was used, it will not locked to the csr, all  will be visible, other statuses, only the csr assigned will see it.
+            date_from: range.from,
+            date_to: range.to,
+            limit: 10, // put -1 for limitless
+          },
+        },
+      });
+
+      return response;
+    } catch (error) {
+      console.error("Error fetching new messages:", error);
+      throw error;
+    }
+  };
 
   const handleTakeTicket = async (ticket_num: string, player: any) => {
     try {
@@ -156,7 +190,6 @@ export const ChatList: React.FC<{
   };
 
   useEffect(() => {
-    handleResize();
     if (!checkCredentials()) navigate("/login");
 
     if (!userDetails) {
@@ -165,19 +198,30 @@ export const ChatList: React.FC<{
         navigate("/login");
         return;
       }
+
       setUserDetails(setUserDetailsLocal());
     }
 
     if (!initialLoad) {
-      handleResize();
-      window.addEventListener("resize", handleResize);
+      (async () => {
+        const res = await fetchTickets("In Progress");
+        const { data } = res;
+        console.log(data.find((x: any) => x.ticket_number == ticket_number));
+        onTicketsChange(
+          data.find((x: any) => x.ticket_number == ticket_number)
+            .customer_details
+        );
+      })();
+
       setInitialLoad(true);
     }
+    handleResize();
+    window.addEventListener("resize", handleResize);
     return () => {
       polling.stop();
       window.removeEventListener("resize", handleResize);
     };
-  }, [filterBadge, selectedTicket, csrId]);
+  }, [filterBadge, selectedTicket]);
 
   return (
     <div className={styles.chatList}>
@@ -194,10 +238,13 @@ export const ChatList: React.FC<{
         </div>
         <div className={styles.toggleSwitch}>
           <label className={styles.switch}>
-            <input type="checkbox" defaultChecked />
+            <input
+              type="checkbox"
+              checked={notifSound}
+              onChange={(e) => setNotifSound(e.target.checked)}
+            />
             <span className={styles.slider}></span>
           </label>
-          <span className={styles.toggleText}>ON</span>
         </div>
       </div>
       {tickets.length ? (

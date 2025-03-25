@@ -32,7 +32,7 @@ export const checkCredentials = () => {
   // Check if token exists in localStorage or cookies
   const localStorageToken = localStorage.getItem("auth_token");
   const cookieToken = Cookies.get("auth_token");
-
+  
   // Check if user data exists in localStorage
   const userData = localStorage.getItem("user_data");
 

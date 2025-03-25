@@ -12,6 +12,7 @@ import { useParams } from "react-router-dom";
 import { apiCall } from "../Services/APICalls";
 import { checkCredentials } from "../Services/Backend/storeLocalData";
 import { useNavigate } from "react-router-dom";
+import { convertImageToBase64 } from "../../helper/img-converter";
 
 export const Chat: React.FC = () => {
   const navigate = useNavigate();
@@ -244,6 +245,7 @@ export const Chat: React.FC = () => {
               if (e.key === "Enter" && !e.shiftKey) {
                 e.preventDefault();
                 handleSend();
+                // @ts-ignore
                 e.target.style.height = "1rem";
               }
             }}
@@ -259,12 +261,37 @@ export const Chat: React.FC = () => {
         </div>
         <div className={styles.buttonGroup}>
           <button className={styles.attachButton}>
-            <img
-              src="/assets/Icons/attach-file.svg"
-              alt=""
-              className="p-0"
-              height={32}
+            <input
+              type="file"
+              id="fileInput"
+              accept=".jpg,.jpeg,.png"
+              style={{ display: 'none' }}
+              onChange={async (e) => {
+                const file = e.target.files?.[0];
+                if (file) {
+                  // Handle the file upload here
+                  const fileSizeMB = (file.size / (1024 * 1024)).toFixed(2);
+                  console.log('File size:', fileSizeMB, 'MB');
+                  console.log('File type:', file.type);
+                  console.log('File:', file);
+                  
+                  try {
+                    const base64 = await convertImageToBase64(file);
+                    console.log('Base64 conversion:', base64);
+                  } catch (error) {
+                    console.error('Error converting to base64:', error);
+                  }
+                }
+              }}
             />
+            <label htmlFor="fileInput">
+              <img
+                src="/assets/Icons/attach-file.svg"
+                alt="Attach file"
+                className="p-0"
+                height={32}
+              />
+            </label>
           </button>
           <button className={styles.endButton}>End</button>
           <button className={styles.rateButton}>Rate</button>

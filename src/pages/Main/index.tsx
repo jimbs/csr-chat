@@ -2,7 +2,10 @@ import React, { useEffect, useMemo, useState } from "react";
 import styles from "./styles.module.scss";
 import { Outlet, useLocation, useParams } from "react-router-dom";
 import { ChatList } from "../ChatList";
-import { checkCredentials, clearLocalData } from "../Services/Backend/storeLocalData";
+import {
+  checkCredentials,
+  clearLocalData,
+} from "../Services/Backend/storeLocalData";
 import { useNavigate } from "react-router-dom";
 
 const filters = [
@@ -18,38 +21,46 @@ export const CSR: React.FC = () => {
   const [filterBadge, setFilterBadge] = useState("Pending");
   const { ticket_number } = useParams();
   const [csrDetails, setCsrDetails] = useState(null);
+  const [notifSound, setNotifSound] = useState(false);
   const [playerDetails, setPlayerDetails] = useState({
     first_name: "John",
     last_name: "Doe",
   });
+  const [isSideMenuOpen, setIsSideMenuOpen] = useState(false);
+  const [windowWidth, setWindowWidth] = useState(window.innerWidth);
 
+  useEffect(() => {
+    if (!checkCredentials()) navigate("/login");
+
+    if (!csrDetails) {
+      if (!setUserDetailsLocal()) {
+        clearLocalData();
+        navigate("/login");
+        return;
+      }
+      setCsrDetails(setUserDetailsLocal());
+
+      if(ticket_number) setFilterBadge("In Progress");
+
+    }
+    const handleResize = () => {
+      setWindowWidth(window.innerWidth);
+    };
+
+    handleResize();
+
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, [ticket_number]);
 
   const setUserDetailsLocal = () => {
     if (localStorage.getItem("user_data") == "undefined") return null;
     return JSON.parse(localStorage.getItem("user_data"));
   };
 
-  useEffect(() => {
-    if (!checkCredentials()) navigate("/login");
-
-    if (!csrDetails) {
-      if(!setUserDetailsLocal()) {
-        clearLocalData();
-        navigate("/login");
-        return;
-      }
-      setCsrDetails(setUserDetailsLocal());
-    }
-    if (window.innerWidth <= 768) {
-      setIsMobileListVisible(true);
-    } else {
-      setIsMobileListVisible(false);
-    }
-  }, [ticket_number]);
-
   return (
     <div className={styles.CSR}>
-      <Header csr={csrDetails} />
+      <Header csr={csrDetails} onMenuClick={() => setIsSideMenuOpen(true)} />
       <div className={styles.mainContent}>
         <div
           className={`${styles.leftPanel} ${`${styles.listWrapper} ${
@@ -62,9 +73,11 @@ export const CSR: React.FC = () => {
               setFilterBadge={setFilterBadge}
             />
             <ChatList
-              csrId={csrDetails?.id}
+              windowWidth={windowWidth}
               filterBadge={filterBadge}
               selectedTicket={ticket_number}
+              notifSound={notifSound}
+              setNotifSound={setNotifSound}
               setFilterBadge={setFilterBadge}
               onTicketsChange={(player: any) => {
                 setPlayerDetails(player);
@@ -75,8 +88,8 @@ export const CSR: React.FC = () => {
         <div className={styles.rightPanel}>
           <ChatHeader
             isOnline={true}
-            onMenuClick={() => setIsMobileListVisible(!isMobileListVisible)}
-            showMobileMenu={!ticket_number}
+            onMenuClick={() => navigate("/")}
+            showMobileMenu={windowWidth < 768}
             playerDetails={playerDetails}
           />
           {ticket_number ? (
@@ -86,12 +99,23 @@ export const CSR: React.FC = () => {
           )}
         </div>
       </div>
+
+      {/* Slide-in menu component */}
+      <SideMenu
+        isOpen={isSideMenuOpen}
+        onClose={() => setIsSideMenuOpen(false)}
+        csr={csrDetails}
+        notifSound={notifSound}
+        setNotifSound={setNotifSound}
+      />
     </div>
   );
 };
 
-const Header: React.FC = ({csr} : any) => {
-  console.log(csr)
+const Header: React.FC<{ csr: any; onMenuClick: () => void }> = ({
+  csr,
+  onMenuClick,
+}) => {
   return (
     <header className={styles.headerContainer}>
       <div className={styles.leftSection}>
@@ -101,13 +125,15 @@ const Header: React.FC = ({csr} : any) => {
 
         {/* User Info */}
         <div className={styles.userInfo}>
-          <p className={styles.userName}>{csr?.first_name || "CSR"} {csr?.last_name || "Name"}</p>
+          <p className={styles.userName}>
+            {csr?.first_name || "CSR"} {csr?.last_name || "Name"}
+          </p>
           <p className={styles.userId}>User ID: {csr?.id}</p>
         </div>
       </div>
 
       {/* Hamburger Menu */}
-      <div className={styles.hamburgerMenu}>
+      <div className={styles.hamburgerMenu} onClick={onMenuClick}>
         <img
           src="/assets/Icons/hamburger.svg"
           alt="Menu"
@@ -118,23 +144,103 @@ const Header: React.FC = ({csr} : any) => {
   );
 };
 
+// New Side Menu Component
+const SideMenu: React.FC<{
+  isOpen: boolean;
+  onClose: () => void;
+  csr: any;
+  notifSound: boolean;
+  setNotifSound: React.Dispatch<React.SetStateAction<boolean>>;
+}> = ({ isOpen, onClose, csr, notifSound, setNotifSound }) => {
+  const navigate = useNavigate();
+
+  const handleSignOut = () => {
+    clearLocalData();
+    navigate("/login");
+  };
+
+  return (
+    <div className={`${styles.sideMenu} ${isOpen ? styles.open : ""}`}>
+      <div className={styles.sideMenuOverlay}></div>
+      <div className={styles.sideMenuContent}>
+        <div className={styles.sideMenuHeader}>
+          <button className={styles.closeButton} onClick={onClose}>
+            <img src="/assets/Icons/close-icon-black.svg" width={12} alt="Close" />
+          </button>
+          <div className={styles.csrProfile}>
+            <img
+              src="https://placehold.co/80"
+              alt="CSR"
+              className={styles.csrAvatar}
+            />
+            <div className={styles.csrProfileDetails}>
+              <h4>
+                {csr?.first_name || "CS"} {csr?.last_name || "Princess"}
+              </h4>
+              <p>User ID: {csr?.id || "10-7045-6543-8912345"}</p>
+            </div>
+          </div>
+        </div>
+
+        <div className={styles.sideMenuOptions}>
+          <div className={styles.menuItem}>
+            <img src="/assets/Icons/sound-icon.svg" alt="Notification" />
+            <span>Notification Sound</span>
+            <div className={styles.toggle}>
+              <input
+                type="checkbox"
+                id="soundToggle"
+                checked={notifSound}
+                onChange={(e) => setNotifSound(e.target.checked)}
+              />
+              <label htmlFor="soundToggle"></label>
+            </div>
+          </div>
+
+          {/* <div className={styles.menuItem}>
+            <img src="/assets/Icons/attendance.svg" alt="Attendance" />
+            <span>My Attendance</span>
+            <img src="/assets/Icons/chevron-right.svg" alt=">" className={styles.chevron} />
+          </div> */}
+
+          <div className={styles.menuItem} onClick={handleSignOut}>
+            <img src="/assets/Icons/logout-icon.svg" alt="Sign Out" />
+            <span>Sign Out</span>
+            <img
+              src="/assets/Icons/arrow-right-head-black.svg"
+              alt=">"
+              className={styles.chevron}
+            />
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 const ChatHeader: React.FC<{
   isOnline?: boolean;
   onMenuClick?: () => void;
   showMobileMenu?: boolean;
-  playerDetails: {[key: string]: string | boolean | number | object | null | undefined; }
+  playerDetails: {
+    [key: string]: string | boolean | number | object | null | undefined;
+  };
 }> = ({ isOnline = true, onMenuClick, showMobileMenu, playerDetails }) => {
-
-  const {ticket_number} = useParams();
+  const { ticket_number } = useParams();
 
   return (
     <div className={styles.chatHeader}>
       {showMobileMenu && (
         <button className={styles.mobileMenuButton} onClick={onMenuClick}>
           <img
-            src="/assets/Icons/hamburger.svg"
-            alt="Menu"
+            src="/assets/Icons/arrow-head-left.svg"
+            alt="back-head"
             className={styles.menuIcon}
+            style={{
+              width: "1.5rem",
+              marginTop: 4,
+              filter: "invert(50%)",
+            }}
           />
         </button>
       )}
@@ -147,13 +253,13 @@ const ChatHeader: React.FC<{
         />
       </div>
       <div className={styles.userInfo}>
-        <h3 className="pb-0 mb-0">{String(playerDetails.first_name)} {String(playerDetails.last_name)}</h3>
+        <h3 className="pb-0 mb-0">
+          {String(playerDetails.first_name)} {String(playerDetails.last_name)}
+        </h3>
         {/* <span className={styles.userId}>ID: {uuid.current}</span> */}
       </div>
       <div className={styles.ticketInfo}>
-        <span className={styles.ticketNumber}>
-          Ticket ID. {ticket_number}
-        </span>
+        <span className={styles.ticketNumber}>Ticket ID. {ticket_number}</span>
         <img
           src="/assets/Icons/more-icon.svg"
           alt="more"

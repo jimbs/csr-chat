@@ -3,7 +3,7 @@
   border-right: 1px solid #e0e0e0;
   overflow-y: auto;
   background-color: #fff;
-  font-family: 'Baloo 2', Courier, monospace;
+  font-family: "Baloo 2", Courier, monospace;
   position: relative;
 
   @media (max-width: 768px) {
@@ -20,7 +20,7 @@
   color: #666;
   font-size: 14px;
   border-left: 0 !important;
-  margin-top: 30%
+  margin-top: 30%;
 }
 
 .messageList {
@@ -35,14 +35,13 @@
   position: relative; // Add this
 }
 
-
-
 .userInfo {
   h3 {
     display: flex;
     align-items: center;
     gap: 8px;
-    margin: 0;.chatListHeader {
+    margin: 0;
+    .chatListHeader {
       position: sticky;
       top: 0;
       z-index: 10;
@@ -57,7 +56,7 @@
       padding: 16px;
       border-bottom: 1px solid #e0e0e0;
     }
-    
+
     .badgeContainer {
       display: flex;
       gap: 7px;
@@ -66,7 +65,7 @@
       align-items: center;
       margin: auto auto;
     }
-    
+
     .badge {
       padding: 6px 24px;
       border-radius: 20px;
@@ -75,35 +74,35 @@
       color: white;
       cursor: pointer;
       transition: opacity 0.2s;
-    
+
       &:hover {
         opacity: 0.9;
       }
     }
-    
+
     .all,
     .new,
     .handled,
     .closed {
-      background-color: #E0E0E0;
+      background-color: #e0e0e0;
       color: #ffffff;
     }
-    
+
     .all.active {
-      background-color: #00A24A;
+      background-color: #00a24a;
     }
-    
+
     .new.active {
-      background-color: #FFE400;
+      background-color: #ffe400;
       color: #000; // Dark text for better contrast on yellow
     }
-    
+
     .handled.active {
-      background-color: #2196F3;
+      background-color: #2196f3;
     }
-    
+
     .closed.active {
-      background-color: #FF2020;
+      background-color: #ff2020;
     }
 
     .status {
@@ -128,8 +127,6 @@
     margin-top: 5px;
   }
 }
-
-
 
 .notificationSection {
   display: flex;
@@ -166,7 +163,7 @@
 .switch {
   position: relative;
   display: inline-block;
-  width: 48px;
+  width: 56px;
   height: 24px;
 }
 
@@ -184,8 +181,11 @@
   right: 0;
   bottom: 0;
   background-color: #ccc;
-  transition: .4s;
+  transition: 0.4s;
   border-radius: 34px;
+  overflow: hidden;
+  font-family: "Baloo 2", Courier, monospace;
+  font-weight: 600;
 
   &:before {
     position: absolute;
@@ -195,21 +195,36 @@
     left: 2px;
     bottom: 2px;
     background-color: white;
-    transition: .4s;
+    transition: 0.4s;
     border-radius: 50%;
   }
 }
 
-input:checked+.slider {
-  background-color: #4CAF50;
+input:checked + .slider:after {
+  content: "On";
+  margin-left: 0rem;
+  padding-left: 8px;
+  padding-right: 2rem;
+  align-self: center;
+  background-color: #4caf50;
+  color: white;
 }
 
-input:checked+.slider:before {
-  transform: translateX(24px);
+input + .slider:after {
+  content: "Off";
+  padding-right: 1.5rem;
+  padding-left: 4px;
+  margin-left: 1.3rem;
+  align-self: center;
+  background-color: #ccc;
+}
+
+input:checked + .slider:before {
+  transform: translateX(32px);
 }
 
 .toggleText {
-  color: #4CAF50;
+  color: #4caf50;
   font-weight: 500;
 }
 
@@ -237,8 +252,8 @@ input:checked+.slider:before {
 }
 
 .searchInput {
-  width: 80%;
-  padding: .7rem 2.5rem;
+  width: -webkit-fill-available;
+  padding: 0.7rem 2.5rem;
   padding-left: 36px;
   margin: auto auto;
   border-radius: 24px;
@@ -303,7 +318,7 @@ input:checked+.slider:before {
   border: 2px solid white;
 
   &.online {
-    background-color: #00A24A;
+    background-color: #00a24a;
   }
 }
 
@@ -311,7 +326,7 @@ input:checked+.slider:before {
   position: absolute;
   top: 15px;
   left: -26px;
-  background-color: #FF4444;
+  background-color: #ff4444;
   color: white;
   border-radius: 50%;
   width: 20px;
@@ -365,7 +380,7 @@ input:checked+.slider:before {
   right: 10px;
   top: 50%;
   transform: translateY(-10%);
-  background-color: #4CAF50;
+  background-color: #4caf50;
   color: white;
   border: none;
   border-radius: 4px;
@@ -374,7 +389,7 @@ input:checked+.slider:before {
   cursor: pointer;
   opacity: 0;
   transition: opacity 0.3s ease;
-  
+
   &:hover {
     background-color: #45a049;
   }
@@ -382,7 +397,7 @@ input:checked+.slider:before {
 
 .chatItem {
   position: relative;
-  
+
   &:hover {
     .takeTicketBtn {
       opacity: 1;

@@ -18,21 +18,16 @@ import CircularProgress from "@mui/material/CircularProgress";
 import { checkCredentials } from "../Services/Backend/storeLocalData";
 export function Login() {
   const [showPassword, setShowPassword] = useState(false);
-
   const navigate = useNavigate();
-
   const [phoneNumber, setPhoneNumber] = useState("");
-
   const [password, setPassword] = useState("");
-
   const [isModalOpen, setModalOpen] = useState(false);
-
   const [isLoading, setIsLoading] = useState(false);
-
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [loginSuccess, setLoginSuccess] = useState(false);
 
-    useEffect(() => {
-      checkCredentials() && navigate("/");
+  useEffect(() => {
+    checkCredentials() && navigate("/");
   }, []);
 
   const togglePasswordVisibility = () => {
@@ -75,7 +70,11 @@ export function Login() {
       // const loginResult = await apiCall(payload);
 
       if (loginResult && loginResult.status_code === 200) {
-        navigate("/");
+        setLoginSuccess(true);
+        // Navigate after showing success message for a moment
+        setTimeout(() => {
+          navigate("/");
+        }, 2000);
       } else {
         setErrorMessage("Login failed. Please check your credentials.");
       }
@@ -83,12 +82,75 @@ export function Login() {
       setErrorMessage("An error occurred during login. Please try again.");
       console.error("Login error:", error);
     } finally {
-      setIsLoading(false);
+      if (!loginSuccess) setIsLoading(false);
     }
   };
 
   return (
     <div className={styles["login-background"]}>
+      {/* Success overlay */}
+      {loginSuccess && (
+        <div
+          style={{
+            position: "fixed",
+            top: 0,
+            left: 0,
+            width: "100%",
+            height: "100%",
+            backgroundColor: "rgba(0, 0, 0, 0.5)",
+            zIndex: 1000,
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+          }}
+        >
+          <div
+            style={{
+              backgroundColor: "white",
+              padding: "20px",
+              borderRadius: "25px",
+              display: "flex",
+              flexDirection: "row",
+              alignItems: "center",
+              maxWidth: "220px",
+            }}
+          >
+            <div
+              style={{
+                borderRadius: "50%",
+                width: "40px",
+                height: "40px",
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                marginBottom: "10px",
+              }}
+            >
+              <img
+                src="/assets/Icons/success-check-icon.svg"
+                width={74}
+                style={{ marginTop: ".5rem" }}
+                alt="Login Successfully"
+              />
+            </div>
+            <p
+              style={{
+                fontFamily: '"Baloo 2", serif',
+                margin: 0,
+                textAlign: "center",
+              }}
+            >
+              Your account has been successfully logged in.
+            </p>
+          </div>
+        </div>
+      )}
+
+      <div className={styles["header-container"]}>
+        <img src="/assets/LoginAssets/karera logo.png" alt="Karera Live" />
+        <img src="/assets/LoginAssets/Secure-login.png" alt="secured login" />
+      </div>
+
       <Typography className={styles.headerText}>
         Let’s Get You Signed In!
       </Typography>
@@ -145,6 +207,11 @@ export function Login() {
                 fullWidth
                 value={password}
                 onChange={handlePasswordChange}
+                onKeyUp={(e) => {
+                  if (e.key === "Enter") {
+                    handleLogin();
+                  }
+                }}
                 type={showPassword ? "text" : "password"}
                 disabled={isLoading} // Add this line
                 sx={{
