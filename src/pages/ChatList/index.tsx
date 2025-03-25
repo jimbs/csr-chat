@@ -217,11 +217,23 @@ export const ChatList: React.FC<{
     }
     handleResize();
     window.addEventListener("resize", handleResize);
+    // Remove the automatic sound play on component mount
+    // playNotificationSound()
     return () => {
       polling.stop();
       window.removeEventListener("resize", handleResize);
     };
   }, [filterBadge, selectedTicket]);
+
+  const playNotificationSound = (sound?: string) => {
+    // Only play if notification sound is enabled
+    if (notifSound) {
+      const audio = new Audio('/assets/Sounds/notification-2-269292.mp3');
+      audio.play().catch(error => {
+        console.error('Error playing notification sound:', error);
+      });
+    }
+  };
 
   return (
     <div className={styles.chatList}>

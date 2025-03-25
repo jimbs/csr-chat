@@ -164,6 +164,7 @@
 .buttonGroup {
   display: flex;
   gap: 8px;
+  align-items: center;
 }
 
 .endButton,
@@ -204,10 +205,19 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  filter: grayscale(100%);
 
   &:hover {
     filter: none;
+  }
+
+  input {
+    cursor: pointer;
+  }
+  img {
+    margin-top: .4rem;
+    aspect-ratio: 1/1;
+    height: 2rem;
+    cursor: pointer;
   }
 }
 
@@ -377,7 +387,7 @@ span.spinner.operator {
   display: flex;
   gap: 10px;
   width: fit-content;
-  transition: .4s;
+  transition: 0.4s;
 
   button {
     flex: 1;
