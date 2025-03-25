@@ -22,6 +22,7 @@ export const Chat: React.FC = () => {
   const [sendingMessages, updateSendingMessages] = useState<any>([]);
   const [data, setData] = useState<any>(null);
   const { ticket_number } = useParams();
+  const [endCallModalShow, setEndCallModalShow] = useState<boolean>(false);
   const user_id = parseInt(localStorage.getItem("user_id"));
 
   const messagesList = useMemo(() => {
@@ -99,7 +100,7 @@ export const Chat: React.FC = () => {
   useEffect(() => {
     if (!checkCredentials()) {
       navigate("/login");
-      return
+      return;
     }
 
     setMessages([]); // Clear messages when ticket_number changes
@@ -150,11 +151,21 @@ export const Chat: React.FC = () => {
     }
   };
 
+  const handleEndCall = async () => {
+    setEndCallModalShow(false);
+  };
+
   return (
     <div
       className={styles.chatContainer}
       key={ticket_number ?? "ticket-number"}
     >
+      {endCallModalShow && (
+        <EndChatModal
+          onConfirm={handleEndCall}
+          onCancel={() => setEndCallModalShow(false)}
+        />
+      )}
       <div className={styles.messageListWrapper}>
         <div className={styles.messageList}>
           {messagesList.map((msg: any, index: any) => (
@@ -265,21 +276,21 @@ export const Chat: React.FC = () => {
               type="file"
               id="fileInput"
               accept=".jpg,.jpeg,.png"
-              style={{ display: 'none' }}
+              style={{ display: "none" }}
               onChange={async (e) => {
                 const file = e.target.files?.[0];
                 if (file) {
                   // Handle the file upload here
                   const fileSizeMB = (file.size / (1024 * 1024)).toFixed(2);
-                  console.log('File size:', fileSizeMB, 'MB');
-                  console.log('File type:', file.type);
-                  console.log('File:', file);
-                  
+                  console.log("File size:", fileSizeMB, "MB");
+                  console.log("File type:", file.type);
+                  console.log("File:", file);
+
                   try {
                     const base64 = await convertImageToBase64(file);
-                    console.log('Base64 conversion:', base64);
+                    console.log("Base64 conversion:", base64);
                   } catch (error) {
-                    console.error('Error converting to base64:', error);
+                    console.error("Error converting to base64:", error);
                   }
                 }
               }}
@@ -293,8 +304,43 @@ export const Chat: React.FC = () => {
               />
             </label>
           </button>
-          <button className={styles.endButton}>End</button>
+          <button
+            className={styles.endButton}
+            onClick={() => setEndCallModalShow(true)}
+          >
+            End
+          </button>
           <button className={styles.rateButton}>Rate</button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const EndChatModal: React.FC<{
+  onConfirm: () => void;
+  onCancel: () => void;
+}> = ({ onConfirm, onCancel }) => {
+  return (
+    <div className={styles.modalOverlay}>
+      <div className={styles.modalContent}>
+        <div className={styles.closeModalButton} onClick={onCancel}>
+          <span>×</span>
+        </div>
+        <div className={styles.modalIcon}>
+          {/* <img src="/assets/Icons/logout-icon.svg" alt="Sign Out" /> */}
+        </div>
+        <div className={styles.modalText}>
+          <p>Are you sure you want to end this chat?</p>
+          <span>It will close the conversation right away.</span>
+        </div>
+        <div className={styles.modalButtons}>
+          <button className={styles.endCallButton} onClick={onConfirm}>
+            Yes, end this chat
+          </button>
+          {/* <button className={styles.cancelButton} onClick={onCancel}>
+            Cancel
+          </button> */}
         </div>
       </div>
     </div>

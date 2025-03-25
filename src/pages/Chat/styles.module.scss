@@ -311,20 +311,111 @@ span.spinner.operator {
   }
 }
 
-// .inputContainer {
-//   display: flex;
-//   flex-direction: column;
-//   justify-content: flex-end; // Align content to bottom
-// }
+.modalOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1100;
+}
 
-// .inputWrapper {
-//   display: flex;
-//   align-items: flex-end; // Align items to bottom
-//   position: relative;
-// }
+.modalContent {
+  background-color: white;
+  border-radius: 10px;
+  padding: 20px;
+  width: 280px;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
 
-// .messageInput {
-//   min-height: 1rem;
-//   transition: height 0.2s ease;
-//   margin-top: auto; // Push to bottom
-// }
+.closeModalButton {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  cursor: pointer;
+  font-size: 20px;
+  color: #999;
+}
+
+.modalIcon {
+  margin: 15px 0;
+  img {
+    width: 50px;
+    height: 50px;
+  }
+}
+
+.modalText {
+  text-align: center;
+  margin-bottom: 20px;
+  font-family: "Baloo 2", sans-serif;
+
+  p {
+    font-family: "Baloo 2", sans-serif;
+    font-size: 16px;
+    line-height: 1.5;
+    margin: 0;
+    font-weight: 600;
+  }
+
+  span {
+    font-family: "Baloo 2", sans-serif;
+    font-size: 14px;
+    line-height: 1.5;
+    margin: 0;
+  }
+}
+
+.modalButtons {
+  display: flex;
+  gap: 10px;
+  width: fit-content;
+  transition: .4s;
+
+  button {
+    flex: 1;
+    padding: 1rem;
+    border-radius: 100px;
+    font-family: "Baloo 2", sans-serif;
+    font-size: 16px;
+    cursor: pointer;
+  }
+}
+
+.confirmButton {
+  background: linear-gradient(180deg, #ff2020 0%, #c80000 100%);
+  color: white;
+  border: 1px solid #c80000;
+
+  &:hover {
+    background-color: #c80000;
+  }
+}
+
+.cancelButton {
+  border: 1px solid #5b5b5b;
+  color: #333;
+  background-color: #fff;
+
+  &:hover {
+    background-color: #dddddd;
+    border: 1px solid #dddddd;
+  }
+}
+
+.endCallButton {
+  background: #00a24a;
+  color: white;
+  border: none;
+
+  &:hover {
+    background-color: #019343;
+  }
+}

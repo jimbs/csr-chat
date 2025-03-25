@@ -153,6 +153,7 @@ const SideMenu: React.FC<{
   setNotifSound: React.Dispatch<React.SetStateAction<boolean>>;
 }> = ({ isOpen, onClose, csr, notifSound, setNotifSound }) => {
   const navigate = useNavigate();
+  const [showSignOutModal, setShowSignOutModal] = useState(false);
 
   const handleSignOut = () => {
     clearLocalData();
@@ -203,7 +204,7 @@ const SideMenu: React.FC<{
             <img src="/assets/Icons/chevron-right.svg" alt=">" className={styles.chevron} />
           </div> */}
 
-          <div className={styles.menuItem} onClick={handleSignOut}>
+          <div className={styles.menuItem} onClick={() => setShowSignOutModal(true)}>
             <img src="/assets/Icons/logout-icon.svg" alt="Sign Out" />
             <span>Sign Out</span>
             <img
@@ -212,6 +213,44 @@ const SideMenu: React.FC<{
               className={styles.chevron}
             />
           </div>
+        </div>
+      </div>
+      
+      {/* Sign Out Confirmation Modal */}
+      {showSignOutModal && (
+        <SignOutModal 
+          onConfirm={handleSignOut} 
+          onCancel={() => setShowSignOutModal(false)} 
+        />
+      )}
+    </div>
+  );
+};
+
+// Sign Out Modal Component
+const SignOutModal: React.FC<{
+  onConfirm: () => void;
+  onCancel: () => void;
+}> = ({ onConfirm, onCancel }) => {
+  return (
+    <div className={styles.modalOverlay}>
+      <div className={styles.modalContent}>
+        <div className={styles.closeModalButton} onClick={onCancel}>
+          <span>×</span>
+        </div>
+        <div className={styles.modalIcon}>
+          <img src="/assets/Icons/logout-icon.svg" alt="Sign Out" />
+        </div>
+        <div className={styles.modalText}>
+          <p>Are you sure you want<br />to Sign Out?</p>
+        </div>
+        <div className={styles.modalButtons}>
+          <button className={styles.confirmButton} onClick={onConfirm}>
+            Yes
+          </button>
+          <button className={styles.cancelButton} onClick={onCancel}>
+            Cancel
+          </button>
         </div>
       </div>
     </div>

@@ -593,7 +593,7 @@
   content: "On";
   line-height: 26px;
   padding-left: 6px;
-  color: #FFF;
+  color: #fff;
 }
 
 .toggle input:checked + label {
@@ -614,4 +614,95 @@
 .chevron {
   width: 16px;
   height: 16px;
+}
+// Add these styles to your existing styles.module.scss file
+
+.modalOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1100;
+}
+
+.modalContent {
+  background-color: white;
+  border-radius: 10px;
+  padding: 20px;
+  width: 220px;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.closeModalButton {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  cursor: pointer;
+  font-size: 20px;
+  color: #999;
+}
+
+.modalIcon {
+  margin: 15px 0;
+  img {
+    width: 50px;
+    height: 50px;
+  }
+}
+
+.modalText {
+  text-align: center;
+  margin-bottom: 20px;
+  p {
+    font-family: "Baloo 2", sans-serif;
+    font-size: 16px;
+    line-height: 1.5;
+    margin: 0;
+    font-weight: 600;
+  }
+}
+
+.modalButtons {
+  display: flex;
+  gap: 10px;
+  width: 100%;
+
+  button {
+    flex: 1;
+    padding: 10px;
+    border-radius: 20px;
+    font-family: "Baloo 2", sans-serif;
+    font-size: 16px;
+    cursor: pointer;
+  }
+}
+
+.confirmButton {
+  background: linear-gradient(180deg, #ff2020 0%, #c80000 100%);
+  color: white;
+  border: 1px solid #c80000 ;
+
+  &:hover {
+    background-color: #c80000;
+  }
+}
+
+.cancelButton {
+  border: 1px solid #5b5b5b;
+  color: #333;
+  background-color: #fff;
+
+  &:hover {
+    background-color: #dddddd;
+    border: 1px solid #dddddd;
+
+  }
 }
