@@ -76,5 +76,5 @@ export const isSessionStill = async () => {
     },
   });
 
-  return userData?.data.session_device === sessionId;
+  return userData?.data.device_session === sessionId;
 };

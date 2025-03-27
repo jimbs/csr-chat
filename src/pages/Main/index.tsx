@@ -29,36 +29,10 @@ export const CSR: React.FC = () => {
 
   const location = useLocation();
 
-  // useMemo(() => {
-  //   if (location.pathname != "/login") {
-  //     // Create a reference to store the timeout ID
-  //     let checkTimerRef: NodeJS.Timeout | null = null;
-      
-  //     const checking = async () => {
-  //       // Clear any existing timeout before setting a new one
-  //       if (checkTimerRef) clearTimeout(checkTimerRef);
-        
-  //       // Check if session is still valid
-  //       if (!(await isSessionStill())) {
-  //         navigate("/login");
-  //         return;
-  //       }
-        
-  //       // Set the new timeout and store its ID
-  //       checkTimerRef = setTimeout(() => {
-  //         checking();
-  //       }, 10000);
-  //     };
-      
-  //     // Start the initial check
-  //     checking();
-      
-  //     // Cleanup function to clear the timeout when component unmounts
-  //     return () => {
-  //       if (checkTimerRef) clearTimeout(checkTimerRef);
-  //     };
-  //   }
-  // }, [location.pathname, navigate]);
+  // Session checking with useEffect instead of useMemo
+  useEffect(() => {
+    // Only run session check if not on login page
+  }, [location.pathname, navigate]);
 
   useEffect(() => {
     // if (!checkCredentials()) {
@@ -83,6 +57,51 @@ export const CSR: React.FC = () => {
     handleResize();
 
     window.addEventListener("resize", handleResize);
+
+    if (location.pathname !== "/login") {
+      let isActive = true;
+      let sessionCheckTimer: NodeJS.Timeout | null = null;
+
+      // Function to check session status
+      const checkSession = async () => {
+        // Only proceed if component is still mounted
+        if (!isActive) return;
+
+        try {
+          const isValid = await isSessionStill();
+          // If session is invalid and component is still mounted, redirect
+          if (!isValid && isActive) {
+            clearLocalData();
+            navigate("/login");
+            return;
+          }
+
+          // Schedule next check only if component is still mounted
+          if (isActive) {
+            sessionCheckTimer = setTimeout(checkSession, 15000);
+          }
+        } catch (error) {
+          console.error("Session check error:", error);
+          // Still schedule next check on error
+          if (isActive) {
+            sessionCheckTimer = setTimeout(checkSession, 15000);
+          }
+        }
+      };
+
+      // Start the initial check
+      checkSession();
+
+      // Cleanup function
+      return () => {
+        isActive = false;
+        if (sessionCheckTimer) {
+          clearTimeout(sessionCheckTimer);
+        }
+        window.removeEventListener("resize", handleResize);
+      };
+    }
+
     return () => window.removeEventListener("resize", handleResize);
   }, [ticket_number]);
 
@@ -119,12 +138,14 @@ export const CSR: React.FC = () => {
           </div>
         </div>
         <div className={styles.rightPanel}>
-         {ticket_number && <ChatHeader
-            isOnline={true}
-            onMenuClick={() => navigate("/")}
-            showMobileMenu={windowWidth < 768}
-            playerDetails={playerDetails}
-          />}
+          {ticket_number && (
+            <ChatHeader
+              isOnline={true}
+              onMenuClick={() => navigate("/")}
+              showMobileMenu={windowWidth < 768}
+              playerDetails={playerDetails}
+            />
+          )}
           {ticket_number ? (
             <Outlet />
           ) : (
