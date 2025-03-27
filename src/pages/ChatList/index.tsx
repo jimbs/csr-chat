@@ -190,7 +190,10 @@ export const ChatList: React.FC<{
   };
 
   useEffect(() => {
-    if (!checkCredentials()) navigate("/login");
+    // if (!checkCredentials()) {
+    //   navigate("/login");
+    //   return;
+    // }
 
     if (!userDetails) {
       if (!setUserDetailsLocal()) {
@@ -206,11 +209,11 @@ export const ChatList: React.FC<{
       (async () => {
         const res = await fetchTickets("In Progress");
         const { data } = res;
-        console.log(data.find((x: any) => x.ticket_number == ticket_number));
-        onTicketsChange(
-          data.find((x: any) => x.ticket_number == ticket_number)
-            .customer_details
-        );
+        if (ticket_number)
+          onTicketsChange(
+            data.find((x: any) => x.ticket_number == ticket_number)
+              .customer_details
+          );
       })();
 
       setInitialLoad(true);
@@ -228,9 +231,9 @@ export const ChatList: React.FC<{
   const playNotificationSound = (sound?: string) => {
     // Only play if notification sound is enabled
     if (notifSound) {
-      const audio = new Audio('/assets/Sounds/notification-2-269292.mp3');
-      audio.play().catch(error => {
-        console.error('Error playing notification sound:', error);
+      const audio = new Audio("/assets/Sounds/notification-2-269292.mp3");
+      audio.play().catch((error) => {
+        console.error("Error playing notification sound:", error);
       });
     }
   };

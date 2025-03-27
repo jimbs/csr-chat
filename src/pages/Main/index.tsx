@@ -5,6 +5,7 @@ import { ChatList } from "../ChatList";
 import {
   checkCredentials,
   clearLocalData,
+  isSessionStill,
 } from "../Services/Backend/storeLocalData";
 import { useNavigate } from "react-router-dom";
 
@@ -22,15 +23,48 @@ export const CSR: React.FC = () => {
   const { ticket_number } = useParams();
   const [csrDetails, setCsrDetails] = useState(null);
   const [notifSound, setNotifSound] = useState(false);
-  const [playerDetails, setPlayerDetails] = useState({
-    first_name: "John",
-    last_name: "Doe",
-  });
+  const [playerDetails, setPlayerDetails] = useState(null);
   const [isSideMenuOpen, setIsSideMenuOpen] = useState(false);
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
 
+  const location = useLocation();
+
+  // useMemo(() => {
+  //   if (location.pathname != "/login") {
+  //     // Create a reference to store the timeout ID
+  //     let checkTimerRef: NodeJS.Timeout | null = null;
+      
+  //     const checking = async () => {
+  //       // Clear any existing timeout before setting a new one
+  //       if (checkTimerRef) clearTimeout(checkTimerRef);
+        
+  //       // Check if session is still valid
+  //       if (!(await isSessionStill())) {
+  //         navigate("/login");
+  //         return;
+  //       }
+        
+  //       // Set the new timeout and store its ID
+  //       checkTimerRef = setTimeout(() => {
+  //         checking();
+  //       }, 10000);
+  //     };
+      
+  //     // Start the initial check
+  //     checking();
+      
+  //     // Cleanup function to clear the timeout when component unmounts
+  //     return () => {
+  //       if (checkTimerRef) clearTimeout(checkTimerRef);
+  //     };
+  //   }
+  // }, [location.pathname, navigate]);
+
   useEffect(() => {
-    if (!checkCredentials()) navigate("/login");
+    // if (!checkCredentials()) {
+    //   navigate("/login");
+    //   return
+    // }
 
     if (!csrDetails) {
       if (!setUserDetailsLocal()) {
@@ -40,8 +74,7 @@ export const CSR: React.FC = () => {
       }
       setCsrDetails(setUserDetailsLocal());
 
-      if(ticket_number) setFilterBadge("In Progress");
-
+      if (ticket_number) setFilterBadge("In Progress");
     }
     const handleResize = () => {
       setWindowWidth(window.innerWidth);
@@ -86,12 +119,12 @@ export const CSR: React.FC = () => {
           </div>
         </div>
         <div className={styles.rightPanel}>
-          <ChatHeader
+         {ticket_number && <ChatHeader
             isOnline={true}
             onMenuClick={() => navigate("/")}
             showMobileMenu={windowWidth < 768}
             playerDetails={playerDetails}
-          />
+          />}
           {ticket_number ? (
             <Outlet />
           ) : (
@@ -126,9 +159,9 @@ const Header: React.FC<{ csr: any; onMenuClick: () => void }> = ({
         {/* User Info */}
         <div className={styles.userInfo}>
           <p className={styles.userName}>
-            {csr?.first_name || "CSR"} {csr?.last_name || "Name"}
+            {csr?.first_name || csr?.username || ""} {csr?.last_name || ""}
           </p>
-          <p className={styles.userId}>User ID: {csr?.id}</p>
+          <p className={styles.userId}>User ID: {csr?.id || ""}</p>
         </div>
       </div>
 
@@ -166,7 +199,11 @@ const SideMenu: React.FC<{
       <div className={styles.sideMenuContent}>
         <div className={styles.sideMenuHeader}>
           <button className={styles.closeButton} onClick={onClose}>
-            <img src="/assets/Icons/close-icon-black.svg" width={12} alt="Close" />
+            <img
+              src="/assets/Icons/close-icon-black.svg"
+              width={12}
+              alt="Close"
+            />
           </button>
           <div className={styles.csrProfile}>
             <img
@@ -204,7 +241,10 @@ const SideMenu: React.FC<{
             <img src="/assets/Icons/chevron-right.svg" alt=">" className={styles.chevron} />
           </div> */}
 
-          <div className={styles.menuItem} onClick={() => setShowSignOutModal(true)}>
+          <div
+            className={styles.menuItem}
+            onClick={() => setShowSignOutModal(true)}
+          >
             <img src="/assets/Icons/logout-icon.svg" alt="Sign Out" />
             <span>Sign Out</span>
             <img
@@ -215,12 +255,12 @@ const SideMenu: React.FC<{
           </div>
         </div>
       </div>
-      
+
       {/* Sign Out Confirmation Modal */}
       {showSignOutModal && (
-        <SignOutModal 
-          onConfirm={handleSignOut} 
-          onCancel={() => setShowSignOutModal(false)} 
+        <SignOutModal
+          onConfirm={handleSignOut}
+          onCancel={() => setShowSignOutModal(false)}
         />
       )}
     </div>
@@ -242,7 +282,11 @@ const SignOutModal: React.FC<{
           <img src="/assets/Icons/logout-icon.svg" alt="Sign Out" />
         </div>
         <div className={styles.modalText}>
-          <p>Are you sure you want<br />to Sign Out?</p>
+          <p>
+            Are you sure you want
+            <br />
+            to Sign Out?
+          </p>
         </div>
         <div className={styles.modalButtons}>
           <button className={styles.confirmButton} onClick={onConfirm}>

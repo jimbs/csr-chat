@@ -56,17 +56,17 @@ export function Login() {
     try {
       const payload = {
         data: {
-          endpoint: "login",
+          endpoint: "username-login",
           data: {
-            login_type: "password",
-            mobile_number: "09050000001", // Replace with the actual phone number
+            // login_type: "password",
+            // mobile_number: "09050000001", // Replace with the actual phone number
             username: phoneNumber,
             password: password,
           },
         },
       };
 
-      const loginResult = await apiCallLocal(payload, payload.data.endpoint);
+      const loginResult = await apiCall(payload, payload.data.endpoint);
       // const loginResult = await apiCall(payload);
 
       if (loginResult && loginResult.status_code === 200) {

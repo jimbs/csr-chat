@@ -16,6 +16,7 @@ export function MobileHeader({ className }: MobileHeaderProps) {
 
   const handleGoLogin = () => {
     navigate("/login");
+    return; 
   };
 
   const handleGoRegister = () => {

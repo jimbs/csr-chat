@@ -98,10 +98,10 @@ export const Chat: React.FC = () => {
   );
 
   useEffect(() => {
-    if (!checkCredentials()) {
-      navigate("/login");
-      return;
-    }
+    // if (!checkCredentials()) {
+    //   navigate("/login");
+    //   return;
+    // }
 
     setMessages([]); // Clear messages when ticket_number changes
     setTimeout(() => {

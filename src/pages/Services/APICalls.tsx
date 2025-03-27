@@ -35,18 +35,15 @@ const generateToken = async () => {
 
 export const apiCall = async (payload, token?) => {
   try {
-    const authToken =
-      payload.data.endpoint == "login"
-        ? ""
-        : token || localStorage.getItem("auth_token");
-
-    //@ts-ignore
-    const url = `${import.meta.env.VITE_API_URL}/api/apiservice`;
+    const url = `${
+      //@ts-ignore
+      import.meta.env[`VITE_API_URL_${import.meta.env.VITE_ENV.toUpperCase()}`]
+    }/api/apiservice`;
     const response = await fetch(url, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${authToken}`,
+        // Authorization: `Bearer ${authToken}`,
       },
       body: JSON.stringify(payload),
     });
@@ -60,6 +57,8 @@ export const apiCall = async (payload, token?) => {
 
     if (contentType && contentType.includes("application/json")) {
       result = await response.json();
+      const sessionId = localStorage.getItem("session_id");
+      if (!sessionId) storeLocalData(result.data?.token, result.data?.user_details, result.data?.device_session);
     } else {
       result = {
         status_code: response.status,
@@ -101,7 +100,7 @@ export const apiCallLocal = async (payload, endpoint, token?) => {
 
     if (contentType && contentType.includes("application/json")) {
       result = await response.json();
-      if (authToken) storeLocalData(authToken, result.data?.user_details);
+      if (authToken) storeLocalData(authToken, result.data?.user_details, result.data?.device_session);
     } else {
       result = {
         status_code: response.status,
