@@ -143,6 +143,18 @@
     color: #888;
     pointer-events: none;
   }
+
+  &:disabled {
+    filter: grayscale(100%);
+    opacity: 0.5;
+    cursor: not-allowed;
+
+    & ~ .inputActions .icon {
+      filter: grayscale(100%);
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+  }
 }
 
 .inputActions {
@@ -156,7 +168,7 @@
     font-size: 20px;
 
     &:hover {
-      color: #333;
+      opacity: .7;
     }
   }
 }
@@ -175,6 +187,12 @@
   cursor: pointer;
   font-weight: 500;
   transition: background-color 0.2s;
+
+  &:disabled {
+    filter: grayscale(100%);
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
 }
 
 .endButton {
@@ -193,6 +211,12 @@
 
 .sendIcon {
   color: #0ca82e;
+
+  &:disabled {
+    filter: grayscale(100%);
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
 }
 
 .attachButton {
@@ -212,9 +236,15 @@
 
   input {
     cursor: pointer;
+
+    &:disabled ~ label img {
+      filter: grayscale(100%);
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
   }
   img {
-    margin-top: .4rem;
+    margin-top: 0.4rem;
     aspect-ratio: 1/1;
     height: 2rem;
     cursor: pointer;
@@ -391,7 +421,7 @@ span.spinner.operator {
 
   button {
     flex: 1;
-    padding: 1rem;
+    padding: 0.5rem 1rem;
     border-radius: 100px;
     font-family: "Baloo 2", sans-serif;
     font-size: 16px;
@@ -428,4 +458,58 @@ span.spinner.operator {
   &:hover {
     background-color: #019343;
   }
+
+  &:disabled {
+    filter: grayscale(100%);
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+.statusDropdownContainer {
+  margin-bottom: 20px;
+  width: 100%;
+
+  p {
+    margin: 0;
+    font-weight: 500;
+  }
+}
+
+.statusDropdown {
+  width: 100%;
+  padding: 10px;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+  background-color: white;
+  font-size: 14px;
+
+  &:focus {
+    outline: none;
+    border-color: #007bff;
+  }
+}
+
+.endChatRow {
+  width: 100%;
+  text-align: center;
+  font-size: 1rem;
+  font-weight: 400;
+  margin: 0.3rem 0;
+
+  &:disabled {
+    filter: grayscale(100%);
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+.buttonSpinner {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top: 2px solid #fff;
+  animation: spin 1s linear infinite;
 }

@@ -13,6 +13,7 @@ import {
   checkCredentials,
   clearLocalData,
 } from "../Services/Backend/storeLocalData";
+import { useToast } from "../../context/ToastContext";
 
 const user_id = -5;
 
@@ -35,6 +36,7 @@ export const ChatList: React.FC<{
 }) => {
   const navigate = useNavigate();
   const location = useLocation();
+  const { showToast } = useToast();
   const [initialLoad, setInitialLoad] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [takingTicket, setTakingTicket] = useState(false);
@@ -205,9 +207,32 @@ export const ChatList: React.FC<{
       setUserDetails(setUserDetailsLocal());
     }
 
+    let hasError = false;
+
     if (!initialLoad) {
       (async () => {
-        const res = await fetchTickets("In Progress");
+        const ticket = await apiCall({
+          data: {
+            endpoint: "get-ticket-details",
+            data: {
+              user_id: user_id,
+              ticket_number: ticket_number,
+            },
+          }, 
+        })
+
+        if (ticket.status_code != 200) {
+         showToast({
+          message: "An error occured while getting ticket details.",
+          type: "error",
+          duration: -1,
+         });
+         polling.stop();
+         return;
+        }
+
+        setFilterBadge(ticket.data.status);
+        const res = await fetchTickets(ticket.data.status);
         const { data } = res;
         if (ticket_number)
           onTicketsChange(

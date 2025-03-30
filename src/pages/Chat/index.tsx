@@ -10,20 +10,21 @@ import {
 import { PollingService } from "../../services/pollingService";
 import { useParams } from "react-router-dom";
 import { apiCall } from "../Services/APICalls";
-import { checkCredentials } from "../Services/Backend/storeLocalData";
-import { useNavigate } from "react-router-dom";
 import { convertImageToBase64 } from "../../helper/img-converter";
+import { useToast } from "../../context/ToastContext";
+
+const endedStatuses = ["Closed Resolved", "Closed Unresolved"];
 
 export const Chat: React.FC = () => {
-  const navigate = useNavigate();
   const [message, setMessage] = useState<any>("");
   const messagesEndRef = useRef<null | HTMLDivElement>(null);
   const [messages, setMessages] = useState<any>([]);
   const [sendingMessages, updateSendingMessages] = useState<any>([]);
-  const [data, setData] = useState<any>(null);
+  const [ticketDetails, setTicketDetails] = useState<any>(null);
   const { ticket_number } = useParams();
   const [endCallModalShow, setEndCallModalShow] = useState<boolean>(false);
   const user_id = parseInt(localStorage.getItem("user_id"));
+  const { showToast } = useToast();
 
   const messagesList = useMemo(() => {
     const sorted_data = [...messages, ...sendingMessages]
@@ -102,12 +103,40 @@ export const Chat: React.FC = () => {
     //   navigate("/login");
     //   return;
     // }
+    setMessages([]);
 
-    setMessages([]); // Clear messages when ticket_number changes
-    setTimeout(() => {
-      scrollToBottom(true);
-    }, 300);
-    polling.start();
+    const handelFetch = async () => {
+      const _data = await apiCall({
+        data: {
+          endpoint: "get-ticket-details",
+          data: {
+            ticket_number: ticket_number,
+            user_id: user_id,
+          },
+        },
+      });
+      if (_data.status_code != 200) {
+        showToast({
+          message: `An error occured getting the ticket ${ticket_number} details. Please reload the browser.`,
+          type: "error",
+          duration: -1,
+        });
+        return;
+      }
+
+      setTicketDetails(() => _data.data);
+
+
+      setTimeout(() => {
+        scrollToBottom(true);
+      }, 500);
+      polling.start();
+      if (endedStatuses.includes(_data.data.status)) {
+        polling.stop();
+      }
+    };
+
+    handelFetch();
 
     return () => {
       if (polling.isActive()) {
@@ -151,7 +180,33 @@ export const Chat: React.FC = () => {
     }
   };
 
-  const handleEndCall = async () => {
+  const handleEndChat = async (status: string) => {
+    // Here you would handle the API call to end the chat with the selected status
+    const response = await apiCall({
+      data: {
+        endpoint: "update-ticket-status",
+        data: {
+          ticket_number: ticket_number,
+          status: status,
+          user_id: user_id,
+        },
+      },
+    });
+
+    if (response.status_code != 200) {
+      showToast({
+        message: `An error occured ending the chat. Please try again.`,
+        type: "error",
+        duration: 6000,
+      });
+      return "failed";
+    }
+
+    setTicketDetails((prev: any) => ({
+      ...prev,
+      status: status,
+    }));
+    polling.stop();
     setEndCallModalShow(false);
   };
 
@@ -162,7 +217,7 @@ export const Chat: React.FC = () => {
     >
       {endCallModalShow && (
         <EndChatModal
-          onConfirm={handleEndCall}
+          onConfirm={(status) => handleEndChat(status)}
           onCancel={() => setEndCallModalShow(false)}
         />
       )}
@@ -238,89 +293,143 @@ export const Chat: React.FC = () => {
               </div>
             </div>
           ))}
+          {endedStatuses.includes(ticketDetails?.status) && (
+            <div className={styles.endChatRow}>
+              This chat session has ended.
+            </div>
+          )}
           <div ref={messagesEndRef} />
         </div>
       </div>
 
-      <div className={styles.inputContainer}>
-        <div className={styles.inputWrapper}>
-          <textarea
-            placeholder="Write your message here..."
-            value={message}
-            onChange={(e) => {
-              setMessage(e.target.value);
-              const lineCount = e.target.value.split("\n").length;
-              e.target.style.height = `${Math.min(lineCount, 4) * 1}rem`;
-            }}
-            onKeyDown={(e) => {
-              if (e.key === "Enter" && !e.shiftKey) {
-                e.preventDefault();
-                handleSend();
-                // @ts-ignore
-                e.target.style.height = "1rem";
-              }
-            }}
-            className={`${styles.messageInput}`}
-            style={{
-              overflowY: "auto",
-              resize: "none",
-            }}
-          />
-          <div className={styles.inputActions}>
-            <Send className={styles.icon} onClick={handleSend} />
-          </div>
-        </div>
-        <div className={styles.buttonGroup}>
-          <button className={styles.attachButton}>
-            <input
-              type="file"
-              id="fileInput"
-              accept=".jpg,.jpeg,.png"
-              style={{ display: "none" }}
-              onChange={async (e) => {
-                const file = e.target.files?.[0];
-                if (file) {
-                  // Handle the file upload here
-                  const fileSizeMB = (file.size / (1024 * 1024)).toFixed(2);
-                  console.log("File size:", fileSizeMB, "MB");
-                  console.log("File type:", file.type);
-                  console.log("File:", file);
-
-                  try {
-                    const base64 = await convertImageToBase64(file);
-                    console.log("Base64 conversion:", base64);
-                  } catch (error) {
-                    console.error("Error converting to base64:", error);
-                  }
+      {ticketDetails && (
+        <div className={styles.inputContainer}>
+          <div className={styles.inputWrapper}>
+            <textarea
+              placeholder="Write your message here..."
+              value={message}
+              onChange={(e) => {
+                if (endedStatuses.includes(ticketDetails.status)) {
+                  e.preventDefault();
+                  setMessage("");
+                  return;
+                }
+                setMessage(e.target.value);
+                const lineCount = e.target.value.split("\n").length;
+                e.target.style.height = `${Math.min(lineCount, 4) * 1}rem`;
+              }}
+              onKeyDown={(e) => {
+                if (endedStatuses.includes(ticketDetails.status)) return;
+                if (e.key === "Enter" && !e.shiftKey) {
+                  e.preventDefault();
+                  handleSend();
+                  // @ts-ignore
+                  e.target.style.height = "1rem";
                 }
               }}
+              className={`${styles.messageInput}`}
+              style={{
+                overflowY: "auto",
+                resize: "none",
+              }}
+              disabled={endedStatuses.includes(ticketDetails.status)}
             />
-            <label htmlFor="fileInput">
-              <img
-                src="/assets/Icons/attach-file.svg"
-                alt="Attach file"
-                className="p-0"
-                height={32}
+            <div className={styles.inputActions}>
+              <Send className={styles.icon} onClick={handleSend} />
+            </div>
+          </div>
+          <div className={styles.buttonGroup}>
+            <button className={styles.attachButton}>
+              <input
+                type="file"
+                id="fileInput"
+                accept=".jpg,.jpeg,.png"
+                style={{ display: "none" }}
+                onClick={(e) => {
+                  if (endedStatuses.includes(ticketDetails.status))
+                    e.preventDefault();
+                }}
+                onChange={async (e) => {
+                  const file = e.target.files?.[0];
+                  if (file) {
+                    // Handle the file upload here
+                    const fileSizeMB = (file.size / (1024 * 1024)).toFixed(2);
+                    console.log("File size:", fileSizeMB, "MB");
+                    console.log("File type:", file.type);
+                    console.log("File:", file);
+
+                    try {
+                      const base64 = await convertImageToBase64(file);
+                      console.log("Base64 conversion:", base64);
+                    } catch (error) {
+                      console.error("Error converting to base64:", error);
+                    }
+                  }
+                }}
+                disabled={endedStatuses.includes(ticketDetails.status)}
               />
-            </label>
-          </button>
-          <button
-            className={styles.endButton}
-            onClick={() => setEndCallModalShow(true)}
-          >
-            End
-          </button>
-          <button className={styles.rateButton}>Rate</button>
+              <label htmlFor="fileInput">
+                <img
+                  src="/assets/Icons/attach-file.svg"
+                  alt="Attach file"
+                  className="p-0"
+                  height={32}
+                />
+              </label>
+            </button>
+            <button
+              className={styles.endButton}
+              onClick={() => {
+                if (endedStatuses.includes(ticketDetails.status)) return;
+                setEndCallModalShow(true);
+              }}
+              disabled={endedStatuses.includes(ticketDetails.status)}
+            >
+              End
+            </button>
+            <button
+              className={styles.rateButton}
+              disabled={!endedStatuses.includes(ticketDetails.status)}
+            >
+              Rate
+            </button>
+          </div>
         </div>
-      </div>
+      )}
     </div>
   );
 };
 
 const EndChatModal: React.FC<{
-  onConfirm: () => void;
+  onConfirm: (status: string) => Promise<string>;
   onCancel: () => void;
 }> = ({ onConfirm, onCancel }) => {
+  const [selectedStatus, setSelectedStatus] = useState<string | null>(null);
+  const { showToast } = useToast();
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+
+  const handleConfirm = async () => {
+    setIsLoading(true);
+    if (selectedStatus) {
+      try {
+        const res = await onConfirm(selectedStatus);
+        if (res == "failed") {
+          setIsLoading(false);
+        }
+      } catch (error) {
+        console.error("Error ending chat:", error);
+      } finally {
+        setIsLoading(false);
+      }
+      return;
+    }
+    showToast({
+      message: "Please select a status to end the chat.",
+      type: "info",
+      duration: 5000,
+    });
+  };
+
   return (
     <div className={styles.modalOverlay}>
       <div className={styles.modalContent}>
@@ -334,13 +443,39 @@ const EndChatModal: React.FC<{
           <p>Are you sure you want to end this chat?</p>
           <span>It will close the conversation right away.</span>
         </div>
+
+        <div className={styles.statusOptions}>
+          <div className={styles.statusDropdownContainer}>
+            <p>Please select a status:</p>
+            <select
+              className={styles.statusDropdown}
+              value={selectedStatus || ""}
+              onChange={(e) => setSelectedStatus(e.target.value)}
+              disabled={isLoading}
+            >
+              <option value="" disabled>
+                Select status
+              </option>
+              <option value="Closed Resolved">Resolved</option>
+              <option value="Closed Unresolved">Unresolved</option>
+            </select>
+          </div>
+        </div>
+
         <div className={styles.modalButtons}>
-          <button className={styles.endCallButton} onClick={onConfirm}>
-            Yes, end this chat
+          <button
+            className={`${styles.endCallButton} ${
+              !selectedStatus || isLoading ? styles.disabled : ""
+            }`}
+            onClick={handleConfirm}
+            disabled={!selectedStatus || isLoading}
+          >
+            {isLoading ? (
+              <span className={styles.buttonSpinner}></span>
+            ) : (
+              "Yes, end this chat"
+            )}
           </button>
-          {/* <button className={styles.cancelButton} onClick={onCancel}>
-            Cancel
-          </button> */}
         </div>
       </div>
     </div>

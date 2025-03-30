@@ -358,7 +358,7 @@ const ChatHeader: React.FC<{
       </div>
       <div className={styles.userInfo}>
         <h3 className="pb-0 mb-0">
-          {String(playerDetails.first_name)} {String(playerDetails.last_name)}
+          {String(playerDetails?.first_name || "")} {String(playerDetails?.last_name || "")}
         </h3>
         {/* <span className={styles.userId}>ID: {uuid.current}</span> */}
       </div>
