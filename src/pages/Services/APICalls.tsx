@@ -39,6 +39,8 @@ export const apiCall = async (payload, token?) => {
       //@ts-ignore
       import.meta.env[`VITE_API_URL_${import.meta.env.VITE_ENV.toUpperCase()}`]
     }/api/apiservice`;
+    console.log(url)
+
     const response = await fetch(url, {
       method: "POST",
       headers: {
