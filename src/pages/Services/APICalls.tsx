@@ -37,7 +37,7 @@ export const apiCall = async (payload, token?) => {
   try {
     const url = `${
       //@ts-ignore
-      import.meta.env[`VITE_API_URL_${import.meta.env.VITE_ENV.toUpperCase()}`]
+      import.meta.env[`VITE_API_URL`]
     }/api/apiservice`;
     console.log(url)
 
