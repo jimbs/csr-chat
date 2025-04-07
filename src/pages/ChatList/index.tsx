@@ -148,6 +148,7 @@ export const ChatList: React.FC<{
             data: {
               user_id: user_id,
               ticket_number: ticket_num,
+              type: "text",
               message: "Hi this is csr_1 happy to serve you.",
             },
             endpoint: "send-ticket-message",
