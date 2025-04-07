@@ -129,6 +129,7 @@ export const Chat: React.FC = () => {
         uuid,
         user_id: user_id,
         message: message,
+        type: "message",
         ticket_number: ticket_number,
         date_created: getCurrentDateTime(),
       };
