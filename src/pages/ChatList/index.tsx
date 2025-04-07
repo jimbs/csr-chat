@@ -207,38 +207,40 @@ export const ChatList: React.FC<{
       setUserDetails(setUserDetailsLocal());
     }
 
-    let hasError = false;
-
     if (!initialLoad) {
       (async () => {
-        const ticket = await apiCall({
-          data: {
-            endpoint: "get-ticket-details",
+        let ticket = null
+        if (ticket_number) {
+          ticket = await apiCall({
             data: {
-              user_id: user_id,
-              ticket_number: ticket_number,
+              endpoint: "get-ticket-details",
+              data: {
+                user_id: user_id,
+                ticket_number: ticket_number,
+              },
             },
-          }, 
-        })
+          });
 
-        if (ticket.status_code != 200) {
-         showToast({
-          message: "An error occured while getting ticket details.",
-          type: "error",
-          duration: -1,
-         });
-         polling.stop();
-         return;
+          if (ticket.status_code != 200) {
+            showToast({
+              message: "An error occured while getting ticket details.",
+              type: "error",
+              duration: -1,
+            });
+            polling.stop();
+            return;
+          }
         }
-
-        setFilterBadge(ticket.data.status);
-        const res = await fetchTickets(ticket.data.status);
+        console.log(ticket)
+        setFilterBadge(ticket?.data.status ?? "Pending");
+        const res = await fetchTickets(ticket?.data.status ?? "Pending");
         const { data } = res;
-        if (ticket_number)
+        if (ticket_number){
           onTicketsChange(
             data.find((x: any) => x.ticket_number == ticket_number)
-              .customer_details
-          );
+              .customer_details || null
+          )
+        }
       })();
 
       setInitialLoad(true);

@@ -340,6 +340,7 @@ input:checked + .slider:before {
 
 .chatInfo {
   flex: 1;
+  overflow: hidden;
 }
 
 .chatHeader {
@@ -357,6 +358,7 @@ input:checked + .slider:before {
 .timeStamp {
   color: #666;
   font-size: 12px;
+  text-align: right;
 }
 
 .messagePreview {
@@ -368,6 +370,11 @@ input:checked + .slider:before {
 
   p {
     margin: 0;
+    width: 90%;
+    padding-right: 1rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 }
 
