@@ -12,6 +12,7 @@ import { useParams } from "react-router-dom";
 import { apiCall } from "../Services/APICalls";
 import { convertImageToBase64 } from "../../helper/img-converter";
 import { useToast } from "../../context/ToastContext";
+import { isMessageImage } from "../../services/messageTypeValidation";
 
 const endedStatuses = ["Closed Resolved", "Closed Unresolved"];
 
@@ -24,6 +25,8 @@ export const Chat: React.FC = () => {
   const { ticket_number } = useParams();
   const [endCallModalShow, setEndCallModalShow] = useState<boolean>(false);
   const user_id = parseInt(localStorage.getItem("user_id"));
+  const [modalImage, setModalImage] = useState<string | null>(null);
+  const [isRating, setIsRating] = useState<boolean>(false);
   const { showToast } = useToast();
 
   const messagesList = useMemo(() => {
@@ -126,7 +129,6 @@ export const Chat: React.FC = () => {
 
       setTicketDetails(() => _data.data);
 
-
       setTimeout(() => {
         scrollToBottom(true);
       }, 500);
@@ -144,6 +146,33 @@ export const Chat: React.FC = () => {
       }
     };
   }, [ticket_number]);
+
+  const getTicketDetails = async () => {
+    try {
+      const _data = await apiCall({
+        data: {
+          endpoint: "get-ticket-details",
+          data: {
+            ticket_number: ticket_number,
+            user_id: user_id,
+          },
+        },
+      });
+      if (_data.status_code != 200) {
+        showToast({
+          message: `An error occured getting the ticket ${ticket_number} details. Please reload the browser.`,
+          type: "error",
+          duration: -1,
+        });
+        return;
+      }
+
+      setTicketDetails(() => _data.data);
+    } catch (error) {
+      console.error("Error fetching new messages:", error);
+      throw error;
+    }
+  };
 
   const scrollToBottom = (quick?: boolean) => {
     messagesEndRef.current?.scrollIntoView({
@@ -181,6 +210,179 @@ export const Chat: React.FC = () => {
     }
   };
 
+  const handleFileUpload = async (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    if (!event.target.files || event.target.files.length === 0) return;
+
+    const files = Array.from(event.target.files);
+    const maxSizeMB = 15; // Maximum size in MB
+    const minSizeMB = 10; // Minimum size in MB
+    const maxSizeBytes = maxSizeMB * 1024 * 1024;
+    const minSizeBytes = minSizeMB * 1024 * 1024;
+
+    const processedFiles: {
+      name: string;
+      type: string;
+      base64: string;
+      size: number;
+    }[] = [];
+
+    for (const file of files) {
+      try {
+        // Convert file to base64
+        const base64Data = await fileToBase64(file);
+        let processedBase64 = base64Data;
+        let currentSize = getBase64Size(base64Data);
+
+        if (currentSize > maxSizeBytes) {
+          processedBase64 = await reduceFileSize(
+            file,
+            base64Data,
+            minSizeBytes,
+            maxSizeBytes
+          );
+          currentSize = getBase64Size(processedBase64);
+        }
+
+        processedFiles.push({
+          name: file.name,
+          type: file.type,
+          base64: processedBase64,
+          size: Math.round((currentSize / (1024 * 1024)) * 100) / 100,
+        });
+
+        processedFiles.forEach(async (file: any) => {
+          const uuid = Math.random().toString(36).substring(2, 15);
+          const newMessage = {
+            uuid,
+            user_id: user_id,
+            message: file.base64,
+            type: "image",
+            ticket_number: ticket_number,
+            date_created: getCurrentDateTime(),
+          };
+
+          updateSendingMessages((prevMessages) => [
+            ...prevMessages,
+            newMessage,
+          ]);
+          setTimeout(() => scrollToBottom(), 800);
+
+          console.log(newMessage);
+          const _data = await apiCall({
+            data: {
+              endpoint: "send-ticket-message",
+              data: newMessage,
+            },
+          });
+
+          if (_data.status_code == 201)
+            updateSendingMessages((prev: any) =>
+              prev.filter((msg: any) => msg.uuid !== uuid)
+            );
+        });
+      } catch (error) {
+        console.error(`Error processing file ${file.name}:`, error);
+      }
+    }
+
+    console.log("Processed files:", processedFiles);
+    // Here you can handle the processed files, e.g., send them to the server
+    // or add them to the message
+  };
+
+  const fileToBase64 = (file: File): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = () => resolve(reader.result as string);
+      reader.onerror = (error) => reject(error);
+    });
+  };
+
+  const getBase64Size = (base64String: string): number => {
+    // Remove the data URL prefix to get just the base64 content
+    const base64 = base64String.split(",")[1];
+    // Calculate size in bytes: (base64 length * 3) / 4 - padding
+    const padding = base64.endsWith("==") ? 2 : base64.endsWith("=") ? 1 : 0;
+    return (base64.length * 3) / 4 - padding;
+  };
+
+  const reduceFileSize = async (
+    file: File,
+    base64Data: string,
+    targetMinSize: number,
+    targetMaxSize: number
+  ): Promise<string> => {
+    // For images, use canvas to reduce quality/resolution
+    if (file.type.startsWith("image/")) {
+      return reduceImageSize(base64Data, targetMinSize, targetMaxSize);
+    }
+
+    // For other file types, we can't easily reduce size
+    // You might want to implement specific handlers for different file types
+    console.warn(`Cannot reduce size for file type: ${file.type}`);
+    return base64Data;
+  };
+
+  const reduceImageSize = (
+    base64Image: string,
+    targetMinSize: number,
+    targetMaxSize: number
+  ): Promise<string> => {
+    return new Promise((resolve) => {
+      const img = new Image();
+      img.src = base64Image;
+
+      img.onload = () => {
+        let quality = 0.9; // Start with high quality
+        let canvas = document.createElement("canvas");
+        let ctx = canvas.getContext("2d")!;
+
+        // Start with original dimensions
+        let width = img.width;
+        let height = img.height;
+
+        // If the image is very large, reduce dimensions first
+        const MAX_DIMENSION = 2000;
+        if (width > MAX_DIMENSION || height > MAX_DIMENSION) {
+          const ratio = Math.min(MAX_DIMENSION / width, MAX_DIMENSION / height);
+          width = width * ratio;
+          height = height * ratio;
+        }
+
+        canvas.width = width;
+        canvas.height = height;
+        ctx.drawImage(img, 0, 0, width, height);
+
+        // Try to find the right quality through binary search
+        const compress = (min: number, max: number) => {
+          quality = (min + max) / 2;
+          const result = canvas.toDataURL("image/jpeg", quality);
+          const size = getBase64Size(result);
+
+          // If we're within the target range or can't get closer, return the result
+          if (
+            (size >= targetMinSize && size <= targetMaxSize) ||
+            Math.abs(max - min) < 0.01
+          ) {
+            resolve(result);
+            return;
+          }
+
+          // Adjust quality and try again
+          if (size > targetMaxSize) {
+            compress(min, quality);
+          } else {
+            compress(quality, max);
+          }
+        };
+        compress(0.1, 1.0);
+      };
+    });
+  };
+
   const handleEndChat = async (status: string) => {
     // Here you would handle the API call to end the chat with the selected status
     const response = await apiCall({
@@ -210,6 +412,28 @@ export const Chat: React.FC = () => {
     polling.stop();
     setEndCallModalShow(false);
   };
+
+  async function rateTheCSR(rating: number) {
+    if (ticketDetails.csr_rating_to_customer) return;
+    ticketDetails.status = rating;
+    const params = {
+      user_id: user_id,
+      ticket_number: ticket_number,
+      csr_rating_to_customer: rating,
+      csr_remarks: rating == 5 ? "Satisfied" : "Unsatisfied",
+      csr_satisfactory: rating == 5 ? "Satisfied" : "Unsatisfied",
+    };
+    const res = await apiCall({
+      data: {
+        endpoint: "rate-customer-for-ticket-interaction",
+        data: params,
+      },
+    });
+
+    if (res.status_code == 200) {
+      await getTicketDetails();
+    }
+  }
 
   return (
     <div
@@ -272,25 +496,39 @@ export const Chat: React.FC = () => {
                   <span className={`${styles.spinner} ${styles.user}`}></span>
                 )}
 
-                <p>
-                  {msg.message.split(/\n|\\n/).map((line: any, index: any) => {
-                    return (
-                      <React.Fragment
-                        key={`${line
-                          .trim()
-                          .split("")
-                          .sort()
-                          .join("")
-                          .substring(0, 6)}${index}`}
-                      >
-                        {line}
-                        {index < msg.message.split(/\n|\\n/).length - 1 && (
-                          <br />
-                        )}
-                      </React.Fragment>
-                    );
-                  })}
-                </p>
+                {isMessageImage(msg.message) ? (
+                  <div className={styles.messageTextWrapper}>
+                    <img
+                      src={msg.message}
+                      alt="Shared image"
+                      style={{
+                        maxWidth: "100%",
+                        maxHeight: "300px",
+                        borderRadius: "8px",
+                        cursor: "pointer",
+                      }}
+                      onClick={() => setModalImage(msg.message)}
+                    />
+                  </div>
+                ) : (
+                  <div className={styles.messageTextWrapper}>
+                    <p>
+                      {(msg.message ?? "")
+                        .split(/\n|\\n/)
+                        .map((line: any, index: any) => {
+                          return (
+                            <React.Fragment key={index}>
+                              {line}
+                              {index <
+                                msg.message.split(/\n|\\n/).length - 1 && (
+                                <br />
+                              )}
+                            </React.Fragment>
+                          );
+                        })}
+                    </p>
+                  </div>
+                )}
               </div>
             </div>
           ))}
@@ -299,6 +537,38 @@ export const Chat: React.FC = () => {
               This chat session has ended.
             </div>
           )}
+          {(!isRating || !ticketDetails?.csr_rating_to_customer) &&
+            endedStatuses.includes(ticketDetails?.status) && (
+              <div
+                className={`${styles.feedbackSection} ${
+                  ticketDetails?.csr_rating_to_customer
+                    ? parseInt(ticketDetails.csr_rating_to_customer) == 5
+                      ? styles["satisfied"]
+                      : styles["not-satisfied"]
+                    : ""
+                }`}
+              >
+                <p>Did we solve your concern?</p>
+                <div className={styles.feedbackIcons}>
+                  <div
+                    id={styles["rateSatisfied"]}
+                    className={styles.feedbackIcon}
+                    onClick={() => rateTheCSR(5)}
+                  >
+                    <img src="/assets/Icons/happy-face.svg" alt="Happy" />
+                    <p>YES</p>
+                  </div>
+                  <div
+                    id={styles["rateUnsatisfied"]}
+                    className={styles.feedbackIcon}
+                    onClick={() => rateTheCSR(1)}
+                  >
+                    <img src="/assets/Icons/sad-face.svg" alt="Sad" />
+                    <p>NO</p>
+                  </div>
+                </div>
+              </div>
+            )}
           <div ref={messagesEndRef} />
         </div>
       </div>
@@ -344,29 +614,14 @@ export const Chat: React.FC = () => {
               <input
                 type="file"
                 id="fileInput"
+                multiple
                 accept=".jpg,.jpeg,.png"
                 style={{ display: "none" }}
                 onClick={(e) => {
                   if (endedStatuses.includes(ticketDetails.status))
                     e.preventDefault();
                 }}
-                onChange={async (e) => {
-                  const file = e.target.files?.[0];
-                  if (file) {
-                    // Handle the file upload here
-                    const fileSizeMB = (file.size / (1024 * 1024)).toFixed(2);
-                    console.log("File size:", fileSizeMB, "MB");
-                    console.log("File type:", file.type);
-                    console.log("File:", file);
-
-                    try {
-                      const base64 = await convertImageToBase64(file);
-                      console.log("Base64 conversion:", base64);
-                    } catch (error) {
-                      console.error("Error converting to base64:", error);
-                    }
-                  }
-                }}
+                onChange={handleFileUpload}
                 disabled={endedStatuses.includes(ticketDetails.status)}
               />
               <label htmlFor="fileInput">
@@ -390,10 +645,93 @@ export const Chat: React.FC = () => {
             </button>
             <button
               className={styles.rateButton}
-              disabled={!endedStatuses.includes(ticketDetails.status)}
+              disabled={
+                !endedStatuses.includes(ticketDetails.status) && ticketDetails?.csr_rating_to_customer
+              }
+              style={{
+                filter:
+                  endedStatuses.includes(ticketDetails.status) &&
+                  !isRating &&
+                  !ticketDetails?.csr_rating_to_customer
+                    ? "none"
+                    : "grayscale(1)",
+                opacity:
+                  endedStatuses.includes(ticketDetails.status) &&
+                  !isRating &&
+                  !ticketDetails?.csr_rating_to_customer
+                    ? "1"
+                    : ".5",
+                cursor:
+                  endedStatuses.includes(ticketDetails.status) &&
+                  !isRating &&
+                  !ticketDetails?.csr_rating_to_customer
+                    ? "auto"
+                    : "not-allowed",
+              }}
+              onClick={() => {
+                if(ticketDetails?.csr_rating_to_customer) return;
+                setIsRating(true);
+              }}
             >
               Rate
             </button>
+          </div>
+        </div>
+      )}
+      {modalImage && (
+        <div
+          style={{
+            position: "fixed",
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: "rgba(0, 0, 0, 0.8)",
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            zIndex: 1000,
+          }}
+          onClick={() => setModalImage(null)}
+        >
+          <div
+            style={{
+              position: "relative",
+              maxWidth: "90%",
+              maxHeight: "90%",
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div
+              style={{
+                position: "absolute",
+                top: "-40px",
+                right: "-40px",
+                width: "30px",
+                height: "30px",
+                borderRadius: "50%",
+                backgroundColor: "white",
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                cursor: "pointer",
+                fontSize: "20px",
+                fontWeight: "bold",
+              }}
+              onClick={() => setModalImage(null)}
+            >
+              ✕
+            </div>
+            <img
+              src={modalImage}
+              alt="Full size image"
+              style={{
+                maxWidth: "100%",
+                maxHeight: "90vh",
+                objectFit: "contain",
+                borderRadius: "8px",
+              }}
+            />
           </div>
         </div>
       )}

@@ -521,3 +521,83 @@ span.spinner.operator {
   border-top: 2px solid #fff;
   animation: spin 1s linear infinite;
 }
+
+.endChatRow {
+  width: 100%;
+  text-align: center;
+  font-size: 1rem;
+  font-weight: 400;
+  margin: 1rem 0;
+
+  &:disabled {
+    filter: grayscale(100%);
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+.feedbackSection {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 20px;
+  background-color: #fff;
+  box-shadow: 0px 0px 4px 0px #00000033;
+  border-radius: 15px;
+  text-align: center;
+  width: fit-content;
+  padding: 1rem;
+  margin: auto;
+  margin-top: 1rem;
+}
+
+.feedbackIcons {
+  display: flex;
+  justify-content: space-around;
+  width: 100%;
+}
+
+.feedbackIcon {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-items: space-between;
+  height: 5rem;
+  margin-bottom: 1rem;
+  cursor: pointer;
+}
+
+.feedbackIcon img {
+  width: 40px;
+  height: 40px;
+  transition: transform 0.2s ease-in-out;
+}
+
+.feedbackIcon:hover img {
+  transform: scale(1.5);
+  transition: transform 0.2s ease-in-out;
+}
+
+.feedbackIcon p {
+  font-size: 14px;
+}
+
+.satisfied #rateSatisfied img {
+  transform: scale(1.5);
+  filter: none; // Remove grayscale
+}
+
+.satisfied #rateUnsatisfied img {
+  filter: grayscale(100%);
+  transform: scale(1); // Reset scale
+}
+
+.not-satisfied #rateUnsatisfied img {
+  transform: scale(1.5);
+  filter: none; // Remove grayscale
+}
+
+.not-satisfied #rateSatisfied img {
+  filter: grayscale(100%);
+  transform: scale(1); // Reset scale
+}

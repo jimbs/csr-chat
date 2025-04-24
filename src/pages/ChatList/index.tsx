@@ -14,6 +14,7 @@ import {
   clearLocalData,
 } from "../Services/Backend/storeLocalData";
 import { useToast } from "../../context/ToastContext";
+import { isMessageImage } from "../../services/messageTypeValidation";
 
 const user_id = -5;
 
@@ -210,7 +211,7 @@ export const ChatList: React.FC<{
 
     if (!initialLoad) {
       (async () => {
-        let ticket = null
+        let ticket = null;
         if (ticket_number) {
           ticket = await apiCall({
             data: {
@@ -232,15 +233,14 @@ export const ChatList: React.FC<{
             return;
           }
         }
-        console.log(ticket)
         setFilterBadge(ticket?.data.status ?? "Pending");
         const res = await fetchTickets(ticket?.data.status ?? "Pending");
         const { data } = res;
-        if (ticket_number){
+        if (ticket_number) {
           onTicketsChange(
             data.find((x: any) => x.ticket_number == ticket_number)
               .customer_details || null
-          )
+          );
         }
       })();
 
@@ -384,13 +384,42 @@ export const ChatList: React.FC<{
                   </span>
                 </div>
                 <div className={styles.messagePreview}>
-                  <p>
-                    {chat.latest_ticket_message?.message
-                      .split(/\n|\\n/)
-                      .join(" ") ?? chat.concern_type}
-                  </p>
-                  {chat.rating && (
-                    <span className={styles.rating}>Rated: {chat.rating}</span>
+                  {isMessageImage(chat.latest_ticket_message?.message) ? (
+                    <p>
+                      Image{" "}
+                      <img
+                        style={{
+                          transform: "translateY(2px)",
+                        }}
+                        width={16}
+                        src="/assets/Icons/image-icon.png"
+                        alt="image-icon"
+                      />
+                    </p>
+                  ) : (
+                    <p>
+                      {chat.latest_ticket_message?.message
+                        .split(/\n|\\n/)
+                        .join(" ") ?? chat.concern_type}
+                    </p>
+                  )}
+                  {chat.customer_rating_to_csr && ( // or chat.csr_rating_to_customer
+                    <span className={styles.rating}>
+                      Rated:{" "}
+                      {chat.customer_rating_to_csr == 5 ? (
+                        <img
+                          width={24}
+                          src="/assets/Icons/happy-face.svg"
+                          alt="Happy"
+                        />
+                      ) : (
+                        <img
+                          width={24}
+                          src="/assets/Icons/sad-face.svg"
+                          alt="Sad"
+                        />
+                      )}
+                    </span>
                   )}
                 </div>
               </div>

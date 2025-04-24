@@ -379,7 +379,10 @@ input:checked + .slider:before {
 }
 
 .rating {
-  font-size: 16px;
+  font-size: 12px;
+  display: inline-flex;
+  gap: 0.25rem;
+  align-items: center;
 }
 
 .takeTicketBtn {
