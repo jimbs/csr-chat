@@ -14,6 +14,6 @@ export const isMessageImage = (message: string): boolean => {
 
   if (message.length > 100 && /^[A-Za-z0-9+/=]+$/.test(message)) return true;
 
-  const regex = /^T-2820250419075414\d+\.png$/;
+  const regex = /^T-\d{16}\d+\.png$/;
   return regex.test(message.substring(message.lastIndexOf("/") + 1));
 };
