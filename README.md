@@ -1,7 +1,7 @@
 # CSR WebApp
-> This app is build for respresentative side of a Casino WebApp
-> Can be still as CSR app and add a customer side as a standalone app
-> or a just an Chat app for both end users
+> This app is build for representative side of a casino/betting webapp;
+> Can add a customer user level to be a standalone app;
+> or just a Chat app for both end users;
 
 ## Dependencies
 - React
