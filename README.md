@@ -20,7 +20,7 @@
 - Run `yarn dev`
 
 ### Note
-- This app is currently in dependent into production API
+- This app is currently dependent into production API of the client
 - For now this branch is only for code reviewing
 - Soon to create a Demo / Viewing branch
   - will build the Backend
